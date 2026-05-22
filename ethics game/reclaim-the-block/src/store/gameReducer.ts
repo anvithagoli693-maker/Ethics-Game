@@ -3,7 +3,6 @@ import type {
   CommunityCard,
   IncidentCard,
   Card,
-  SurveillanceCard,
   NeighborhoodId,
   DeviceType,
   SlotIndex,
@@ -321,7 +320,7 @@ function placeDevice(
 // ── Incident Resolution ───────────────────────────────────────────────────
 
 function resolveIncident(state: GameState, incident: IncidentCard, voteChoice?: 'comply' | 'refuse'): GameState {
-  let s = { ...state, pendingIncident: null };
+  let s: GameState = { ...state, pendingIncident: null };
   s = log(s, `Resolving incident: ${incident.name}`);
 
   switch (incident.effectType) {
@@ -330,9 +329,9 @@ function resolveIncident(state: GameState, incident: IncidentCard, voteChoice?: 
       const target = [...s.neighborhoods].sort((a, b) => b.densityTrack - a.densityTrack)[0];
       const device = deviceForTracker(s.densityTracker);
       for (let i = 0; i < 2; i++) {
-        const emptySlot = target.slots.findIndex((sl) => sl === null) as SlotIndex;
-        if (emptySlot === -1) break;
-        s = placeDevice(s, target.id, emptySlot as SlotIndex, device);
+        const emptySlotIdx = s.neighborhoods.find(n => n.id === target.id)!.slots.findIndex((sl) => sl === null);
+        if (emptySlotIdx === -1) break;
+        s = placeDevice(s, target.id, emptySlotIdx as SlotIndex, device);
       }
       s = shiftMeter(s, -2, 'Breaking News: Crime Reported');
       break;
@@ -892,8 +891,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         s = { ...s, surveillanceDeck: deck, surveillanceDiscard: [...s.surveillanceDiscard, card] };
 
         const device = deviceForTracker(s.densityTracker);
-        const deviceCount = s.reducedBoardPhaseRounds > 0 ? 1 : 1; // always 1 per card; "reduced" was "1 instead of 2" in card effect
-
         s = placeDevice(s, card.neighborhood, card.slot, device);
         s = log(s, `Board Phase: ${deviceEmoji(device)} placed in ${card.neighborhood} slot ${card.slot + 1}`);
       }
