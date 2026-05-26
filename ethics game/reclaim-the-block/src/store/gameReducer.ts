@@ -80,6 +80,38 @@ function adjacentSlots(slot: SlotIndex): SlotIndex[] {
   return adj[slot];
 }
 
+// Adjacency graph for player movement: each position maps to valid 1-step destinations.
+// From a neighborhood slot → other slots in same neighborhood OR the road-1 waypoint.
+// From road-1 waypoint → city-hall OR back into neighborhood slots.
+// From city-hall → any neighborhood's road-1 waypoint.
+export function getReachablePositions(from: Position): Position[] {
+  const neighborhoods = ['suburb', 'courthouse', 'media', 'politics'] as const;
+
+  if (from === 'city-hall') {
+    return ['suburb-road-1', 'courthouse-road-1', 'media-road-1', 'politics-road-1'] as Position[];
+  }
+
+  for (const nh of neighborhoods) {
+    if (from === (`${nh}-road-1` as Position)) {
+      return ['city-hall', `${nh}-n1`, `${nh}-n2`, `${nh}-n3`, `${nh}-n4`] as Position[];
+    }
+    // Legacy neighborhood-center position: treat same as being in the neighborhood
+    if (from === (nh as Position)) {
+      return [`${nh}-n1`, `${nh}-n2`, `${nh}-n3`, `${nh}-n4`, `${nh}-road-1`] as Position[];
+    }
+    const slotMatch = (from as string).match(new RegExp(`^${nh}-n(\\d)$`));
+    if (slotMatch) {
+      const currentSlot = parseInt(slotMatch[1]) - 1;
+      const otherSlots = ([0, 1, 2, 3] as const)
+        .filter((i) => i !== currentSlot)
+        .map((i) => `${nh}-n${i + 1}` as Position);
+      return [...otherSlots, `${nh}-road-1` as Position];
+    }
+  }
+
+  return [];
+}
+
 // ── Initial State ──────────────────────────────────────────────────────────
 
 export function buildInitialState(playerCount: 2 | 3 | 4): GameState {
@@ -203,8 +235,10 @@ function drawCommunityCards(state: GameState, playerId: number, count: number): 
   s = { ...s, communityDeck: deck, communityDiscard: discard };
 
   if (deferredIncident) {
-    s = { ...s, pendingIncident: { card: deferredIncident } };
+    const newTracker = Math.min(8, s.densityTracker + 1);
+    s = { ...s, pendingIncident: { card: deferredIncident }, densityTracker: newTracker };
     s = log(s, `⚠️ INCIDENT: ${deferredIncident.name}`);
+    s = log(s, `Surveillance Density increased to ${newTracker}`);
   }
 
   return s;
@@ -294,8 +328,10 @@ function placeDevice(
         const incident = communityDeck.splice(i, 1)[0] as IncidentCard;
         discard.push(incident);
         if (!s.cancelNextIncident) {
-          s = { ...s, pendingIncident: { card: incident }, communityDeck, communityDiscard: discard };
+          const newTracker = Math.min(8, s.densityTracker + 1);
+          s = { ...s, pendingIncident: { card: incident }, communityDeck, communityDiscard: discard, densityTracker: newTracker };
           s = log(s, `⚠️ INCIDENT (neighborhood full): ${incident.name}`);
+          s = log(s, `Surveillance Density increased to ${newTracker}`);
         } else {
           s = { ...s, cancelNextIncident: false, communityDeck, communityDiscard: discard };
           s = log(s, `Incident "${incident.name}" cancelled by Class Action.`);
@@ -323,7 +359,7 @@ function placeDevice(
 
 // ── Incident Resolution ───────────────────────────────────────────────────
 
-function resolveIncident(state: GameState, incident: IncidentCard, voteChoice?: 'comply' | 'refuse', discardCardId?: string): GameState {
+function resolveIncident(state: GameState, incident: IncidentCard, discardCardId?: string): GameState {
   let s: GameState = { ...state, pendingIncident: null };
   s = log(s, `Resolving incident: ${incident.name}`);
 
@@ -340,16 +376,20 @@ function resolveIncident(state: GameState, incident: IncidentCard, voteChoice?: 
       s = shiftMeter(s, -2, 'Breaking News: Crime Reported');
       break;
     }
-    case 'meter-minus':
+    case 'meter-minus': {
+      const target = [...s.neighborhoods].sort((a, b) => b.densityTrack - a.densityTrack)[0];
+      const emptySlot = s.neighborhoods.find((n) => n.id === target.id)!.slots.findIndex((sl) => sl === null);
+      if (emptySlot !== -1) s = placeDevice(s, target.id, emptySlot as SlotIndex, deviceForTracker(s.densityTracker));
       s = shiftMeter(s, -3, 'Innocent Person Flagged');
       break;
-    case 'police-footage-request':
-      if (voteChoice === 'comply') {
-        s = shiftMeter(s, -3, 'Police Footage Request — complied');
-      } else {
-        s = shiftMeter(s, -2, 'Police Footage Request — refused');
-      }
+    }
+    case 'police-footage-request': {
+      const target = [...s.neighborhoods].sort((a, b) => b.densityTrack - a.densityTrack)[0];
+      const emptySlot = s.neighborhoods.find((n) => n.id === target.id)!.slots.findIndex((sl) => sl === null);
+      if (emptySlot !== -1) s = placeDevice(s, target.id, emptySlot as SlotIndex, deviceForTracker(s.densityTracker));
+      s = shiftMeter(s, -3, 'Police Footage Request — footage handed over');
       break;
+    }
     case 'add-device-all-neighborhoods': {
       const device = deviceForTracker(s.densityTracker);
       for (const n of s.neighborhoods) {
@@ -362,6 +402,9 @@ function resolveIncident(state: GameState, incident: IncidentCard, voteChoice?: 
       break;
     }
     case 'neighbor-reports-neighbor': {
+      const target = [...s.neighborhoods].sort((a, b) => b.densityTrack - a.densityTrack)[0];
+      const emptySlot = s.neighborhoods.find((n) => n.id === target.id)!.slots.findIndex((sl) => sl === null);
+      if (emptySlot !== -1) s = placeDevice(s, target.id, emptySlot as SlotIndex, deviceForTracker(s.densityTracker));
       s = shiftMeter(s, -2, 'Neighbor Reports Neighbor');
       const activePlayer = s.players[s.currentPlayerIndex];
       if (activePlayer.hand.length > 0) {
@@ -637,8 +680,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     // ── Move ──────────────────────────────────────────────────────────
     case 'MOVE': {
       if (state.actionsRemaining < 1) return state;
+      const player = state.players[state.currentPlayerIndex];
+      if (!getReachablePositions(player.position).includes(action.to)) return state;
       const players = state.players.map((p) =>
-        p.id === state.players[state.currentPlayerIndex].id ? { ...p, position: action.to } : p
+        p.id === player.id ? { ...p, position: action.to } : p
       );
       let s = spendActions({ ...state, players }, 1);
       s = log(s, `${s.players[state.currentPlayerIndex].role.name} moved to ${action.to}`);
@@ -944,7 +989,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'INCIDENT_VOTE': {
       if (!state.pendingIncident) return state;
       const incident = state.pendingIncident.card;
-      return resolveIncident(state, incident, action.choice, action.discardCardId);
+      return resolveIncident(state, incident, action.discardCardId);
     }
 
     // ── Discard card ──────────────────────────────────────────────────

@@ -35,8 +35,15 @@ export default function ActionPanel({
     selectedCards.length >= 2 &&
     selectedCards[0].category === NHCOLOR[selectedNeighborhood];
 
+  // Player must be in the neighborhood (at any slot) to remove a device
+  const playerInSelectedNeighborhood =
+    selectedNeighborhood !== null &&
+    (player.position === selectedNeighborhood ||
+      player.position.startsWith(`${selectedNeighborhood}-n`));
+
   const canRemove =
     canAct &&
+    playerInSelectedNeighborhood &&
     selectedSlot !== null &&
     selectedNeighborhood !== null &&
     twoSameColor &&
@@ -45,6 +52,7 @@ export default function ActionPanel({
 
   const canLegalRemove =
     canAct &&
+    playerInSelectedNeighborhood &&
     player.role.id === 'legal' &&
     !player.hasUsedSpecialAbilityThisTurn &&
     selectedCards.length >= 2 &&
@@ -84,19 +92,9 @@ export default function ActionPanel({
           <div className="incident-title">⚠️ INCIDENT: {pendingIncident.card.name}</div>
           <div className="incident-effect">{pendingIncident.card.effect}</div>
           <div className="incident-edu">{pendingIncident.card.educationalNote}</div>
-          {pendingIncident.card.effectType === 'police-footage-request' ? (
-            <div className="incident-vote">
-              <p>Vote: Comply (meter -3) or Refuse (meter -2)?</p>
-              <button className="btn btn-danger" onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'comply' })}>
-                Comply (−3)
-              </button>
-              <button className="btn btn-warning" onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse' })}>
-                Refuse (−2)
-              </button>
-            </div>
-          ) : pendingIncident.card.effectType === 'neighbor-reports-neighbor' ? (
+          {pendingIncident.card.effectType === 'neighbor-reports-neighbor' ? (
             <div className="incident-discard">
-              <p>Choose a card from your hand to discard:</p>
+              <p>Discard a card from your hand:</p>
               {player.hand.length > 0 ? (
                 <div className="discard-options">
                   {player.hand.map((card) => (
@@ -112,7 +110,7 @@ export default function ActionPanel({
                 </div>
               ) : (
                 <button className="btn btn-danger" onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse' })}>
-                  Resolve Incident
+                  Acknowledge
                 </button>
               )}
             </div>
@@ -121,7 +119,7 @@ export default function ActionPanel({
               className="btn btn-danger"
               onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse' })}
             >
-              Resolve Incident
+              Acknowledge
             </button>
           )}
         </div>

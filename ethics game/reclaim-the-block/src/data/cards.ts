@@ -727,7 +727,7 @@ export const INCIDENT_CARDS: IncidentCard[] = [
     id: 'incident-02',
     type: 'incident',
     name: 'Innocent Person Flagged',
-    effect: 'Meter -3.',
+    effect: 'Add 1 device to most surveilled neighborhood. Meter -3.',
     effectType: 'meter-minus',
     educationalNote:
       "Ring's Neighbors app disproportionately flags people of color. The majority of \"suspicious person\" posts in New York City targeted people of color doing ordinary activities.",
@@ -736,7 +736,7 @@ export const INCIDENT_CARDS: IncidentCard[] = [
     id: 'incident-03',
     type: 'incident',
     name: 'Police Footage Request',
-    effect: 'Players vote. Comply: meter -3. Refuse: meter -2.',
+    effect: 'Police access footage without consent. Add 1 device to most surveilled neighborhood. Meter −3.',
     effectType: 'police-footage-request',
     educationalNote:
       'Amazon handed Ring footage to police without warrants until 2024. Residents were never notified their cameras were part of a police surveillance network.',
@@ -754,7 +754,7 @@ export const INCIDENT_CARDS: IncidentCard[] = [
     id: 'incident-05',
     type: 'incident',
     name: 'Neighbor Reports Neighbor',
-    effect: 'Meter -2. Active player discards 1 Community Card.',
+    effect: 'Add 1 device to most surveilled neighborhood. Meter -2. Active player discards 1 Community Card.',
     effectType: 'neighbor-reports-neighbor',
     educationalNote:
       'Neighborhood watch apps have been documented turning neighbors against each other along racial and class lines.',

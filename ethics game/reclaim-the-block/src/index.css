@@ -196,8 +196,36 @@ input, select { font-family: inherit; }
 .board-n1 { display: flex; justify-content: center; width: 100%; }
 .board-roads-top, .board-roads-bottom {
   display: flex; justify-content: center;
-  height: 32px;
+  height: 60px;
 }
+.road-segment-v {
+  display: flex; flex-direction: column; align-items: center;
+}
+.road-segment-h {
+  display: flex; flex-direction: row; align-items: center;
+}
+.road-line-v {
+  width: 4px; flex: 1;
+  background: repeating-linear-gradient(to bottom, #94a3b8 0, #94a3b8 8px, transparent 8px, transparent 16px);
+}
+.road-line-h {
+  height: 4px; width: 14px;
+  background: repeating-linear-gradient(to right, #94a3b8 0, #94a3b8 8px, transparent 8px, transparent 16px);
+}
+.road-waypoint {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid #64748b;
+  font-size: 0.75rem;
+  transition: box-shadow 0.15s;
+  z-index: 1;
+}
+.road-waypoint.moveable { cursor: pointer; box-shadow: 0 0 0 2px #38bdf8; }
+.road-waypoint.moveable:hover { box-shadow: 0 0 0 3px #38bdf8, 0 0 14px rgba(56,189,248,0.35); }
+.road-waypoint.active-player-here { box-shadow: 0 0 0 3px rgba(255,255,255,0.6), 0 0 16px rgba(255,255,255,0.25); }
+/* keep legacy selectors in case referenced elsewhere */
 .road-v {
   width: 4px; height: 100%;
   background: repeating-linear-gradient(to bottom, #94a3b8 0, #94a3b8 8px, transparent 8px, transparent 16px);
@@ -284,6 +312,8 @@ input, select { font-family: inherit; }
 .device-slot.active-player-here { box-shadow: 0 0 0 3px rgba(255,255,255,0.6), 0 0 16px rgba(255,255,255,0.25); }
 .device-slot.slot-moveable { cursor: pointer; outline: 1px dashed #38bdf8; }
 .device-slot.slot-moveable:hover { outline: none; box-shadow: 0 0 0 2px #38bdf8; }
+.device-slot.slot-removeable { cursor: pointer; outline: 1px dashed #f87171; }
+.device-slot.slot-removeable:hover { outline: none; box-shadow: 0 0 0 2px #f87171; }
 .device-token { font-size: 1.1rem; }
 .slot-label { font-size: 0.65rem; color: var(--text-muted); }
 .slot-pawns { display: flex; gap: 1px; line-height: 1; }

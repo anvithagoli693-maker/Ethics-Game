@@ -1,4 +1,5 @@
 import type { Neighborhood, Player, DeviceType, SlotIndex, Position } from '../types/game';
+import { getReachablePositions } from '../store/gameReducer';
 
 interface Props {
   neighborhood: Neighborhood;
@@ -56,18 +57,21 @@ export default function NeighborhoodTile({
     (p) => p.position === neighborhood.id || p.position.startsWith(neighborhood.id + '-n')
   );
   const filledSlots = neighborhood.slots.filter(Boolean).length;
-  // Highlight logic: true when the active player is anywhere in this neighborhood
   const isCurrentNeighborhood =
     activePlayerPosition === neighborhood.id ||
     activePlayerPosition.startsWith(neighborhood.id + '-n');
-  const tileMoveable = canMove && !isCurrentNeighborhood;
+  const roadTile = `${neighborhood.id}-road-1` as Position;
+  const isOnRoadToThis = activePlayerPosition === roadTile;
+  const reachableFromHere = canMove ? getReachablePositions(activePlayerPosition as Position) : [];
+  // Clicking the tile moves to this neighborhood's road waypoint (first step)
+  const tileMoveable = canMove && !isCurrentNeighborhood && !isOnRoadToThis && reachableFromHere.includes(roadTile);
 
   return (
     <div
       className={`neighborhood-tile ${isSelected ? 'selected' : ''} ${filledSlots === 4 ? 'full' : ''} ${tileMoveable ? 'moveable' : ''}`}
       style={{ borderColor: color }}
       onClick={() => {
-        if (tileMoveable) onMove(neighborhood.id as Position);
+        if (tileMoveable) onMove(roadTile);
         onSelect();
       }}
     >
@@ -90,14 +94,16 @@ export default function NeighborhoodTile({
             (p) => slotPositionOf(p.position, neighborhood.id) === i
           );
           const slotPos = `${neighborhood.id}-n${i + 1}` as Position;
-          // City Hall connects to all neighborhoods, so treat it like being in any neighborhood for slot movement
-          const slotMoveable = canMove && activePlayerPosition !== slotPos && (isCurrentNeighborhood || activePlayerPosition === 'city-hall');
+          // Slots are reachable from within the neighborhood or from the road waypoint
+          const slotMoveable = canMove && activePlayerPosition !== slotPos && (isCurrentNeighborhood || isOnRoadToThis);
           // Highlight logic: exact slot match, only when actions are available
           const isActivePlayerHere = canMove && activePlayerPosition === slotPos;
+          // Slot has a device and player is in the neighborhood — highlight as removeable target
+          const slotRemoveable = canMove && isCurrentNeighborhood && device !== null && !isActivePlayerHere;
           return (
             <div
               key={i}
-              className={`device-slot ${device ? 'occupied' : 'empty'} ${selectedSlot === i ? 'slot-selected' : ''} ${playersOnSlot.length > 0 ? 'player-here' : ''} ${slotMoveable ? 'slot-moveable' : ''} ${isActivePlayerHere ? 'active-player-here' : ''}`}
+              className={`device-slot ${device ? 'occupied' : 'empty'} ${selectedSlot === i ? 'slot-selected' : ''} ${playersOnSlot.length > 0 ? 'player-here' : ''} ${slotMoveable ? 'slot-moveable' : ''} ${isActivePlayerHere ? 'active-player-here' : ''} ${slotRemoveable ? 'slot-removeable' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (slotMoveable) onMove(slotPos);

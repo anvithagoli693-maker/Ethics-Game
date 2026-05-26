@@ -1,5 +1,5 @@
 import { useReducer, useState, useCallback } from 'react';
-import { gameReducer, buildInitialState } from './store/gameReducer';
+import { gameReducer, buildInitialState, getReachablePositions } from './store/gameReducer';
 import type { NeighborhoodId, SlotIndex, CommunityCard } from './types/game';
 import GameSetup from './components/GameSetup';
 import GameOver from './components/GameOver';
@@ -56,6 +56,7 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
     && !(state.pendingIncident)
     && state.actionsRemaining > 0;
 
+
   if (state.phase === 'won' || state.phase === 'lost') {
     return (
       <GameOver
@@ -69,6 +70,8 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
   }
 
   const activePlayer = state.players[state.currentPlayerIndex];
+  const reachablePositions = canMove ? getReachablePositions(activePlayer.position) : [];
+  const reachable = (pos: import('./types/game').Position) => reachablePositions.includes(pos);
 
   return (
     <div className="game-layout">
@@ -104,7 +107,20 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
               />
             </div>
 
-            <div className="board-roads-top"><div className="road-v" /></div>
+            <div className="board-roads-top">
+              <div className="road-segment-v">
+                <div className="road-line-v" />
+                <div
+                  className={`road-waypoint${activePlayer.position === 'suburb-road-1' ? ' active-player-here' : ''}${reachable('suburb-road-1') ? ' moveable' : ''}`}
+                  onClick={() => { if (reachable('suburb-road-1')) handleMove('suburb-road-1'); }}
+                >
+                  {state.players.filter((p) => p.position === 'suburb-road-1').map((p) => (
+                    <span key={p.id} title={p.role.name}>{p.role.emoji}</span>
+                  ))}
+                </div>
+                <div className="road-line-v" />
+              </div>
+            </div>
 
             <div className="board-middle">
               <NeighborhoodTile
@@ -119,10 +135,21 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
                 onMove={handleMove}
               />
               <div className="city-hall-area">
-                <div className="road-h" />
+                <div className="road-segment-h">
+                  <div className="road-line-h" />
+                  <div
+                    className={`road-waypoint${activePlayer.position === 'courthouse-road-1' ? ' active-player-here' : ''}${reachable('courthouse-road-1') ? ' moveable' : ''}`}
+                    onClick={() => { if (reachable('courthouse-road-1')) handleMove('courthouse-road-1'); }}
+                  >
+                    {state.players.filter((p) => p.position === 'courthouse-road-1').map((p) => (
+                      <span key={p.id} title={p.role.name}>{p.role.emoji}</span>
+                    ))}
+                  </div>
+                  <div className="road-line-h" />
+                </div>
                 <div
-                  className={`city-hall ${state.players.some((p) => p.position === 'city-hall') ? 'has-players' : ''} ${canMove && activePlayer.position !== 'city-hall' ? 'moveable' : ''} ${activePlayer.position === 'city-hall' ? 'active-player-here' : ''}`}
-                  onClick={() => { if (canMove && activePlayer.position !== 'city-hall') handleMove('city-hall'); }}
+                  className={`city-hall ${state.players.some((p) => p.position === 'city-hall') ? 'has-players' : ''} ${reachable('city-hall') ? 'moveable' : ''} ${activePlayer.position === 'city-hall' ? 'active-player-here' : ''}`}
+                  onClick={() => { if (reachable('city-hall')) handleMove('city-hall'); }}
                 >
                   <div className="city-hall-label">🏛️ CITY HALL</div>
                   <div className="city-hall-sublabel">Deposit Zone</div>
@@ -131,17 +158,19 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
                       <span key={p.id} title={p.role.name}>{p.role.emoji}</span>
                     ))}
                   </div>
-                  {state.players.some((p) => p.position.includes('road')) && (
-                    <div className="city-hall-road-players">
-                      {state.players.filter((p) => p.position.includes('road')).map((p) => (
-                        <span key={p.id} className="road-player" title={`${p.role.name} on road`}>
-                          {p.role.emoji}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
-                <div className="road-h" />
+                <div className="road-segment-h">
+                  <div className="road-line-h" />
+                  <div
+                    className={`road-waypoint${activePlayer.position === 'media-road-1' ? ' active-player-here' : ''}${reachable('media-road-1') ? ' moveable' : ''}`}
+                    onClick={() => { if (reachable('media-road-1')) handleMove('media-road-1'); }}
+                  >
+                    {state.players.filter((p) => p.position === 'media-road-1').map((p) => (
+                      <span key={p.id} title={p.role.name}>{p.role.emoji}</span>
+                    ))}
+                  </div>
+                  <div className="road-line-h" />
+                </div>
               </div>
               <NeighborhoodTile
                 neighborhood={state.neighborhoods[2]}
@@ -156,7 +185,20 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
               />
             </div>
 
-            <div className="board-roads-bottom"><div className="road-v" /></div>
+            <div className="board-roads-bottom">
+              <div className="road-segment-v">
+                <div className="road-line-v" />
+                <div
+                  className={`road-waypoint${activePlayer.position === 'politics-road-1' ? ' active-player-here' : ''}${reachable('politics-road-1') ? ' moveable' : ''}`}
+                  onClick={() => { if (reachable('politics-road-1')) handleMove('politics-road-1'); }}
+                >
+                  {state.players.filter((p) => p.position === 'politics-road-1').map((p) => (
+                    <span key={p.id} title={p.role.name}>{p.role.emoji}</span>
+                  ))}
+                </div>
+                <div className="road-line-v" />
+              </div>
+            </div>
 
             <div className="board-n4">
               <NeighborhoodTile
