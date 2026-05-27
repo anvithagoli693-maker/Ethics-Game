@@ -166,6 +166,7 @@ export function buildInitialState(playerCount: 2 | 3 | 4): GameState {
     journalistPreviewDone: false,
 
     pendingIncident: null,
+    pendingDiscard: null,
 
     blockedBoardPhases: 0,
     reducedBoardPhaseRounds: 0,
@@ -195,6 +196,7 @@ export type GameAction =
   | { type: 'DEPOSIT_AT_CITY_HALL'; cardIds: string[] }
   | { type: 'USE_SPECIAL_ABILITY'; targetNeighborhoodId?: NeighborhoodId; targetSlotIndex?: SlotIndex; revealCount?: number }
   | { type: 'END_TURN' }
+  | { type: 'DISCARD_TO_HAND_LIMIT'; cardIds: string[] }
   | { type: 'BOARD_PHASE' }
   | { type: 'INCIDENT_VOTE'; choice: 'comply' | 'refuse'; discardCardId?: string }
   | { type: 'DISCARD_CARD'; cardId: string };
@@ -637,6 +639,30 @@ function checkWinLoss(state: GameState): GameState {
   return state;
 }
 
+function advanceTurn(s: GameState): GameState {
+  const nextIndex = (s.currentPlayerIndex + 1) % s.players.length;
+  const isNewRound = nextIndex === 0;
+  if (isNewRound) {
+    s = { ...s, phase: 'board-phase', currentPlayerIndex: nextIndex };
+    s = log(s, 'All players done — moving to Board Phase.');
+  } else {
+    const nextPlayer = s.players[nextIndex];
+    const players = s.players.map((p) =>
+      p.id === nextPlayer.id ? { ...p, hasUsedSpecialAbilityThisTurn: false } : p
+    );
+    s = {
+      ...s,
+      currentPlayerIndex: nextIndex,
+      actionsRemaining: 0,
+      players,
+      phase: 'player-turn',
+      pendingDiceRoll: true,
+    };
+    s = log(s, `${nextPlayer.role.name}'s turn — roll the dice!`);
+  }
+  return checkWinLoss(s);
+}
+
 // ── Main Reducer ──────────────────────────────────────────────────────────
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -894,39 +920,26 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
       }
 
-      // Enforce hand limit 7
+      // Enforce hand limit 7 — let the player choose which to discard
       const updatedPlayer = s.players.find((p) => p.id === player.id)!;
       if (updatedPlayer.hand.length > 7) {
-        const excess = updatedPlayer.hand.slice(7);
-        s = removeCardFromHand(s, player.id, excess.map((c) => c.id));
-        s = log(s, `${player.role.name} discarded ${excess.length} card(s) to meet hand limit.`);
+        const excess = updatedPlayer.hand.length - 7;
+        s = log(s, `${player.role.name} must discard ${excess} card(s) to meet the 7-card hand limit.`);
+        return { ...s, pendingDiscard: { playerId: player.id, count: excess } };
       }
 
-      // Advance player
-      const nextIndex = (s.currentPlayerIndex + 1) % s.players.length;
-      const isNewRound = nextIndex === 0;
+      return advanceTurn(s);
+    }
 
-      if (isNewRound) {
-        s = { ...s, phase: 'board-phase', currentPlayerIndex: nextIndex };
-        s = log(s, 'All players done — moving to Board Phase.');
-      } else {
-        // Next player's turn — they must roll first
-        const nextPlayer = s.players[nextIndex];
-        const players = s.players.map((p) =>
-          p.id === nextPlayer.id ? { ...p, hasUsedSpecialAbilityThisTurn: false } : p
-        );
-        s = {
-          ...s,
-          currentPlayerIndex: nextIndex,
-          actionsRemaining: 0,
-          players,
-          phase: 'player-turn',
-          pendingDiceRoll: true,
-        };
-        s = log(s, `${nextPlayer.role.name}'s turn — roll the dice!`);
-      }
-
-      return checkWinLoss(s);
+    case 'DISCARD_TO_HAND_LIMIT': {
+      if (!state.pendingDiscard) return state;
+      const { playerId, count } = state.pendingDiscard;
+      if (action.cardIds.length !== count) return state;
+      const playerName = state.players.find((p) => p.id === playerId)!.role.name;
+      let s = removeCardFromHand(state, playerId, action.cardIds);
+      s = log(s, `${playerName} discarded ${count} card(s) to meet the hand limit.`);
+      s = { ...s, pendingDiscard: null };
+      return advanceTurn(s);
     }
 
     // ── Board Phase ───────────────────────────────────────────────────

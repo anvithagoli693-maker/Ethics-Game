@@ -20,7 +20,7 @@ export default function ActionPanel({
   dispatch,
   onClearSelection,
 }: Props) {
-  const { phase, actionsRemaining, currentPlayerIndex, players, pendingIncident } = state;
+  const { phase, actionsRemaining, currentPlayerIndex, players, pendingIncident, pendingDiscard } = state;
   const player = players[currentPlayerIndex];
   const actions = actionsRemaining;
 
@@ -122,6 +122,27 @@ export default function ActionPanel({
               Acknowledge
             </button>
           )}
+        </div>
+      )}
+
+      {/* Hand limit discard */}
+      {pendingDiscard && (
+        <div className="incident-box">
+          <div className="incident-title">✋ Hand Limit Reached</div>
+          <div className="incident-effect">
+            Select {pendingDiscard.count} card{pendingDiscard.count > 1 ? 's' : ''} from your hand to discard.
+            ({selectedCardIds.length}/{pendingDiscard.count} selected)
+          </div>
+          <button
+            className="btn btn-danger"
+            disabled={selectedCardIds.length !== pendingDiscard.count}
+            onClick={() => {
+              dispatch({ type: 'DISCARD_TO_HAND_LIMIT', cardIds: selectedCardIds });
+              onClearSelection();
+            }}
+          >
+            Confirm Discard
+          </button>
         </div>
       )}
 

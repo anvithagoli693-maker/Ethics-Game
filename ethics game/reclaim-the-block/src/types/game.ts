@@ -140,6 +140,7 @@ export interface GameState {
   journalistPreviewDone: boolean;
 
   pendingIncident: PendingIncident | null;
+  pendingDiscard: { playerId: number; count: number } | null;
 
   blockedBoardPhases: number;
   reducedBoardPhaseRounds: number;
