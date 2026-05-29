@@ -462,7 +462,7 @@ input, select { font-family: inherit; }
 /* ── Game Log ─────────────────────────────────────────────── */
 .game-log {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); flex: 1;
+  border-radius: var(--radius); flex-shrink: 0;
 }
 .log-header {
   padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);
