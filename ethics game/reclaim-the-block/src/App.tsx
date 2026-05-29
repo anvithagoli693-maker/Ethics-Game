@@ -83,14 +83,15 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
         <button className="btn-quit" onClick={onRestart}>← New Game</button>
       </header>
 
-      <div className="meters-row">
-        <PrivacyMeter value={state.privacyMeter} />
-        <DensityTracker value={state.densityTracker} />
-      </div>
+      <div className="game-body">
+        <div className="side-tracker">
+          <PrivacyMeter value={state.privacyMeter} vertical />
+        </div>
 
-      <RevealedCards cards={state.revealedSurveillanceCards} />
+        <div className="game-center">
+          <RevealedCards cards={state.revealedSurveillanceCards} />
 
-      <div className="main-area">
+          <div className="main-area">
         <div className="board-area">
           <div className="board-grid">
             <div className="board-n1">
@@ -227,7 +228,13 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
           />
           <GameLog log={state.gameLog} />
         </div>
-      </div>
+        </div>{/* end main-area */}
+        </div>{/* end game-center */}
+
+        <div className="side-tracker">
+          <DensityTracker value={state.densityTracker} vertical />
+        </div>
+      </div>{/* end game-body */}
 
       <div className="players-row">
         {state.players.map((player) => (

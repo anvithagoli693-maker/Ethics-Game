@@ -117,12 +117,69 @@ input, select { font-family: inherit; }
 }
 .btn-quit:hover { border-color: var(--text); color: var(--text); }
 
-/* ── Meters Row ───────────────────────────────────────────── */
-.meters-row {
-  display: flex; gap: 1rem; padding: 0.75rem 1rem;
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
+/* ── Game Body (side trackers + center) ──────────────────── */
+.game-body {
+  display: flex; flex: 1; min-height: 0;
 }
+.game-center {
+  flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+}
+.side-tracker {
+  width: 80px; flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+.side-tracker:last-child { border-right: none; border-left: 1px solid var(--border); }
+
+/* Vertical Privacy Meter */
+.privacy-meter-v {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0.75rem 0.4rem; gap: 4px; flex: 1;
+}
+.meter-v-title {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 0.62rem; font-weight: 600; color: var(--text-muted);
+  text-align: center; margin-bottom: 4px;
+}
+.meter-v-value { font-weight: 700; font-size: 0.9rem; }
+.meter-v-safe { color: var(--green); font-size: 0.65rem; font-weight: 600; }
+.meter-v-lose { color: var(--red); font-size: 0.65rem; font-weight: 600; }
+.meter-v-track {
+  flex: 1; width: 20px; background: #334155; border-radius: 10px;
+  position: relative; display: flex; align-items: flex-end; overflow: hidden;
+  min-height: 80px;
+}
+.meter-v-fill {
+  width: 100%; border-radius: 10px;
+  transition: height 0.4s ease, background 0.4s ease;
+}
+.meter-v-marker {
+  position: absolute; left: 0; width: 100%; height: 2px;
+  background: rgba(255,255,255,0.5);
+}
+.meter-v-warning { font-size: 1rem; animation: pulse 1s infinite; }
+
+/* Vertical Density Tracker */
+.density-tracker-v {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0.75rem 0.4rem; gap: 4px; flex: 1;
+}
+.density-v-title {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 0.62rem; font-weight: 600; color: var(--text-muted);
+  text-align: center; margin-bottom: 4px;
+}
+.density-v-level { font-weight: 700; font-size: 0.85rem; color: var(--yellow); }
+.density-v-track { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+.density-step-v {
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 3px 2px;
+  font-size: 0.75rem; color: var(--text-muted);
+}
+.density-step-v.current { background: var(--yellow); border-color: var(--yellow); color: #000; font-weight: 700; }
+.density-step-v.passed { background: #334155; opacity: 0.5; }
+.density-v-num { font-size: 0.6rem; }
 
 /* Privacy Meter */
 .privacy-meter { flex: 2; min-width: 280px; }

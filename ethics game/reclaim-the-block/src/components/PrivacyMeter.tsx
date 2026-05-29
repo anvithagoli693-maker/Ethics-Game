@@ -1,10 +1,27 @@
 interface Props {
   value: number;
+  vertical?: boolean;
 }
 
-export default function PrivacyMeter({ value }: Props) {
+export default function PrivacyMeter({ value, vertical }: Props) {
   const pct = (value / 30) * 100;
   const color = value <= 5 ? '#ef4444' : value <= 10 ? '#f97316' : value <= 15 ? '#eab308' : '#22c55e';
+
+  if (vertical) {
+    return (
+      <div className="privacy-meter-v">
+        <div className="meter-v-title">Privacy &amp; Trust</div>
+        <div className="meter-v-value" style={{ color }}>{value}</div>
+        <div className="meter-v-safe">30</div>
+        <div className="meter-v-track">
+          <div className="meter-v-fill" style={{ height: `${pct}%`, background: color }} />
+          <div className="meter-v-marker" style={{ bottom: `${pct}%` }} />
+        </div>
+        <div className="meter-v-lose">0</div>
+        {value <= 5 && <div className="meter-v-warning">⚠️</div>}
+      </div>
+    );
+  }
 
   return (
     <div className="privacy-meter">
