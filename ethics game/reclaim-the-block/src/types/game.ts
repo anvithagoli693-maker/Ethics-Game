@@ -7,10 +7,10 @@ export type SlotIndex = 0 | 1 | 2 | 3;
 export type Position =
   | NeighborhoodId
   | 'city-hall'
-  | 'suburb-road-1' | 'suburb-road-2'
-  | 'courthouse-road-1' | 'courthouse-road-2'
-  | 'media-road-1' | 'media-road-2'
-  | 'politics-road-1' | 'politics-road-2'
+  | 'suburb-road-1'
+  | 'courthouse-road-1'
+  | 'media-road-1'
+  | 'politics-road-1'
   | 'suburb-n1' | 'suburb-n2' | 'suburb-n3' | 'suburb-n4'
   | 'courthouse-n1' | 'courthouse-n2' | 'courthouse-n3' | 'courthouse-n4'
   | 'media-n1' | 'media-n2' | 'media-n3' | 'media-n4'

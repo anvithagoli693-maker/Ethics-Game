@@ -58,9 +58,7 @@ export default function NeighborhoodTile({
     activePlayerPosition === neighborhood.id ||
     activePlayerPosition.startsWith(neighborhood.id + '-n');
   const roadTile = `${neighborhood.id}-road-1` as Position;
-  const isOnRoadToThis =
-    activePlayerPosition === roadTile ||
-    activePlayerPosition === (`${neighborhood.id}-road-2` as Position);
+  const isOnRoadToThis = activePlayerPosition === roadTile;
   const reachableFromHere = canMove ? getReachablePositions(activePlayerPosition as Position) : [];
   // Clicking the tile moves to this neighborhood's road-1 waypoint (first step)
   const tileMoveable = canMove && !isCurrentNeighborhood && !isOnRoadToThis && reachableFromHere.includes(roadTile);

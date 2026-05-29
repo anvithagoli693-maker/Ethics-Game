@@ -90,10 +90,9 @@ export function getReachablePositions(from: Position): Position[] {
   }
 
   for (const nh of neighborhoods) {
-    if (from === (`${nh}-road-1` as Position)) return ['city-hall', `${nh}-road-2`] as Position[];
-    if (from === (`${nh}-road-2` as Position)) return [`${nh}-road-1`, `${nh}-n1`] as Position[];
+    if (from === (`${nh}-road-1` as Position)) return ['city-hall', `${nh}-n1`] as Position[];
     // Square ring: nr1=top(n1↔n2), nr2=right(n2↔n4), nr3=bottom(n3↔n4), nr4=left(n1↔n3)
-    if (from === (`${nh}-n1` as Position))  return [`${nh}-road-2`, `${nh}-nr1`, `${nh}-nr4`] as Position[];
+    if (from === (`${nh}-n1` as Position))  return [`${nh}-road-1`, `${nh}-nr1`, `${nh}-nr4`] as Position[];
     if (from === (`${nh}-n2` as Position))  return [`${nh}-nr1`, `${nh}-nr2`] as Position[];
     if (from === (`${nh}-n3` as Position))  return [`${nh}-nr4`, `${nh}-nr3`] as Position[];
     if (from === (`${nh}-n4` as Position))  return [`${nh}-nr2`, `${nh}-nr3`] as Position[];
