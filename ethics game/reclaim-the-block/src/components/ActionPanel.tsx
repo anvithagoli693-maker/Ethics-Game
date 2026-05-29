@@ -78,10 +78,11 @@ export default function ActionPanel({
   return (
     <div className="action-panel">
       <div className="action-header">
-        <span className="phase-badge">{getPhaseName(phase)}</span>
-        {phase === 'player-turn' && (
-          <span className="whose-turn">{player.role.emoji} {player.role.name}'s turn</span>
-        )}
+        <span className="phase-badge">
+          {phase === 'player-turn'
+            ? `${player.role.emoji} ${player.role.name}'s turn`
+            : getPhaseName(phase)}
+        </span>
         {phase === 'player-turn' && !state.pendingDiceRoll && (
           <span className="actions-remaining">
             ⚡ {actions} action{actions !== 1 ? 's' : ''} remaining
