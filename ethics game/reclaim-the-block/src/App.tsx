@@ -247,6 +247,38 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
           />
         ))}
       </div>
+
+      {/* Drawn cards popup overlay */}
+      {state.pendingDrawnCards && (
+        <div className="drawn-cards-overlay">
+          <div className="drawn-cards-modal">
+            <div className="drawn-cards-title">
+              {state.players.find((p) => p.id === state.pendingDrawnCards!.playerId)?.role.emoji}{' '}
+              {state.players.find((p) => p.id === state.pendingDrawnCards!.playerId)?.role.name} drew{' '}
+              {state.pendingDrawnCards.cards.length} card{state.pendingDrawnCards.cards.length !== 1 ? 's' : ''}
+            </div>
+            <div className="drawn-cards-list">
+              {state.pendingDrawnCards.cards.map((card) => (
+                <div key={card.id} className={`drawn-card cat-border-${card.category}`}>
+                  <div className="drawn-card-header">
+                    <span className={`card-dot cat-${card.category}`} />
+                    <span className="drawn-card-name">{card.name}</span>
+                    {card.isPowerUp && <span className="drawn-card-star">⭐</span>}
+                  </div>
+                  <div className="drawn-card-effect">{card.effect}</div>
+                  <div className="drawn-card-edu">{card.educationalContent}</div>
+                </div>
+              ))}
+            </div>
+            <button
+              className="btn btn-primary drawn-cards-confirm"
+              onClick={() => dispatch({ type: 'ACKNOWLEDGE_DRAWN_CARDS' })}
+            >
+              Add to Hand
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

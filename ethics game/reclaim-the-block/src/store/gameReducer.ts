@@ -169,6 +169,7 @@ export function buildInitialState(playerCount: 2 | 3 | 4): GameState {
     journalistPreviewDone: false,
 
     pendingIncident: null,
+    pendingDrawnCards: null,
     pendingDiscard: null,
 
     blockedBoardPhases: 0,
@@ -199,12 +200,55 @@ export type GameAction =
   | { type: 'DEPOSIT_AT_CITY_HALL'; cardIds: string[] }
   | { type: 'USE_SPECIAL_ABILITY'; targetNeighborhoodId?: NeighborhoodId; targetSlotIndex?: SlotIndex; revealCount?: number }
   | { type: 'END_TURN' }
+  | { type: 'ACKNOWLEDGE_DRAWN_CARDS' }
   | { type: 'DISCARD_TO_HAND_LIMIT'; cardIds: string[] }
   | { type: 'BOARD_PHASE' }
   | { type: 'INCIDENT_VOTE'; choice: 'comply' | 'refuse'; discardCardId?: string }
   | { type: 'DISCARD_CARD'; cardId: string };
 
 // ── Helpers ───────────────────────────────────────────────────────────────
+
+// Like drawCommunityCards but returns community cards separately instead of adding to hand.
+// Incidents are still resolved normally (set pendingIncident).
+function peekDrawCards(state: GameState, count: number): { state: GameState; drawnCards: CommunityCard[] } {
+  let s = { ...state };
+  let deck = [...s.communityDeck];
+  let discard = [...s.communityDiscard];
+  let deferredIncident: IncidentCard | null = null;
+  const drawnCards: CommunityCard[] = [];
+
+  for (let i = 0; i < count; i++) {
+    if (deck.length === 0) {
+      if (discard.length === 0) break;
+      deck = shuffle(discard);
+      discard = [];
+      s = log(s, 'Community deck reshuffled from discard.');
+    }
+    const card = deck.shift()!;
+    if (card.type === 'incident') {
+      discard.push(card);
+      if (s.cancelNextIncident) {
+        s = { ...s, cancelNextIncident: false };
+        s = log(s, `Incident "${card.name}" cancelled by Class Action.`);
+      } else if (!deferredIncident) {
+        deferredIncident = card as IncidentCard;
+      }
+    } else {
+      drawnCards.push(card as CommunityCard);
+    }
+  }
+
+  s = { ...s, communityDeck: deck, communityDiscard: discard };
+
+  if (deferredIncident) {
+    const newTracker = Math.min(8, s.densityTracker + 1);
+    s = { ...s, pendingIncident: { card: deferredIncident }, densityTracker: newTracker };
+    s = log(s, `⚠️ INCIDENT: ${deferredIncident.name}`);
+    s = log(s, `Surveillance Density increased to ${newTracker}`);
+  }
+
+  return { state: s, drawnCards };
+}
 
 function drawCommunityCards(state: GameState, playerId: number, count: number): GameState {
   let s = { ...state };
@@ -906,10 +950,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const player = state.players[state.currentPlayerIndex];
       let s = state;
 
-      // Draw 2 community cards
-      s = drawCommunityCards(s, player.id, 2);
+      // Peek 2 community cards — hold them for display before adding to hand
+      const { state: s2, drawnCards } = peekDrawCards(s, 2);
+      s = s2;
 
       // Organizer draws an extra card if colocated (same neighborhood counts)
+      let extraDrawn: CommunityCard[] = [];
       if (player.role.id === 'organizer') {
         const nids = ['suburb', 'courthouse', 'media', 'politics'] as const;
         const playerNhd = nids.find((id) => player.position === id || player.position.startsWith(id + '-n'));
@@ -919,16 +965,38 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           return p.position === player.position;
         });
         if (colocated) {
-          s = drawCommunityCards(s, player.id, 1);
+          const { state: s3, drawnCards: extra } = peekDrawCards(s, 1);
+          s = s3;
+          extraDrawn = extra;
         }
       }
 
-      // Enforce hand limit 7 — let the player choose which to discard
-      const updatedPlayer = s.players.find((p) => p.id === player.id)!;
+      const allDrawn = [...drawnCards, ...extraDrawn];
+
+      if (allDrawn.length > 0) {
+        return { ...s, pendingDrawnCards: { playerId: player.id, cards: allDrawn } };
+      }
+
+      // No community cards drawn (all were incidents or deck empty) — advance immediately
+      return advanceTurn(s);
+    }
+
+    // ── Acknowledge drawn cards (add peeked cards to hand) ────────────
+    case 'ACKNOWLEDGE_DRAWN_CARDS': {
+      if (!state.pendingDrawnCards) return state;
+      const { playerId, cards } = state.pendingDrawnCards;
+      const player = state.players.find((p) => p.id === playerId)!;
+      const players = state.players.map((p) =>
+        p.id === playerId ? { ...p, hand: [...p.hand, ...cards] } : p
+      );
+      let s: GameState = { ...state, players, pendingDrawnCards: null };
+      s = log(s, `${player.role.name} drew ${cards.length} card${cards.length !== 1 ? 's' : ''}.`);
+
+      const updatedPlayer = s.players.find((p) => p.id === playerId)!;
       if (updatedPlayer.hand.length > 7) {
         const excess = updatedPlayer.hand.length - 7;
         s = log(s, `${player.role.name} must discard ${excess} card(s) to meet the 7-card hand limit.`);
-        return { ...s, pendingDiscard: { playerId: player.id, count: excess } };
+        return { ...s, pendingDiscard: { playerId, count: excess } };
       }
 
       return advanceTurn(s);

@@ -745,6 +745,61 @@ input, select { font-family: inherit; }
   margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; text-align: left;
 }
 
+/* ── Drawn Cards Overlay ─────────────────────────────────── */
+.drawn-cards-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+.drawn-cards-modal {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  box-shadow: 6px 6px 0 var(--px-dark);
+  padding: 1.5rem;
+  max-width: 600px; width: 90%;
+  max-height: 80vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.drawn-cards-title {
+  font-size: 1rem; font-weight: 700; color: var(--text);
+  text-align: center;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+.drawn-cards-list {
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.drawn-card {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  box-shadow: inset 2px 2px 0 var(--px-highlight);
+  padding: 0.75rem 1rem;
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.drawn-card.cat-border-blue   { border-color: var(--blue); }
+.drawn-card.cat-border-yellow { border-color: var(--yellow); }
+.drawn-card.cat-border-green  { border-color: var(--green); }
+.drawn-card.cat-border-red    { border-color: var(--red); }
+.drawn-card.cat-border-purple { border-color: var(--purple); }
+.drawn-card-header {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.drawn-card-name {
+  font-weight: 700; font-size: 0.9rem; color: var(--text); flex: 1;
+}
+.drawn-card-star { font-size: 0.85rem; }
+.drawn-card-effect {
+  font-size: 0.8rem; color: var(--text); line-height: 1.5;
+}
+.drawn-card-edu {
+  font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;
+  border-top: 1px solid var(--border); padding-top: 0.35rem; margin-top: 0.1rem;
+}
+.drawn-cards-confirm {
+  align-self: center; margin-top: 0.5rem;
+  padding: 0.6rem 2rem; font-size: 0.85rem;
+}
+
 /* ── Scrollbars ───────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--px-dark); }
