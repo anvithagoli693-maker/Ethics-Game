@@ -222,7 +222,7 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
       </div>
 
       {/* ── LEFT SIDE: Privacy Meter ──────────────────────────── */}
-      <div className="tv-pm side-tracker">
+      <div className="tv-pm">
         <PrivacyMeter value={state.privacyMeter} vertical />
       </div>
 
@@ -381,7 +381,7 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
       </div>
 
       {/* ── RIGHT SIDE: Density Tracker ───────────────────────── */}
-      <div className="tv-dt side-tracker">
+      <div className="tv-dt">
         <DensityTracker value={state.densityTracker} vertical />
       </div>
 
