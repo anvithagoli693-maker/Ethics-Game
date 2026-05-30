@@ -1136,6 +1136,56 @@ html, body {
 .corner-hand .card:hover { transform: translateY(-6px); }
 .corner-hand .card-selected { transform: translateY(-10px) !important; }
 
+/* ── Turn action popup ─────────────────────────────────────── */
+
+/* Base popup — fixed overlay sitting on top of the corner card area */
+.turn-popup {
+  position: fixed;
+  width: 23vw;
+  z-index: 100;
+  overflow-y: auto;
+  max-height: 78vh;
+  background: var(--surface);
+  border: 3px solid var(--border);
+  box-shadow: 4px 4px 0 var(--px-dark);
+}
+
+/* Bottom corners — anchor to bottom of screen, slide up */
+.turn-popup-bl { left: 0;  bottom: 0; }
+.turn-popup-br { right: 0; bottom: 0; }
+
+/* Top corners — anchor to top of screen, slide down */
+.turn-popup-tl { left: 0;  top: 0; }
+.turn-popup-tr { right: 0; top: 0; }
+
+/* Rotate content so top-corner players read it right-side-up */
+.popup-inner-rotated { transform: rotate(180deg); }
+
+/* Enter animations */
+.turn-popup-bl.popup-enter,
+.turn-popup-br.popup-enter {
+  animation: popup-up-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.turn-popup-tl.popup-enter,
+.turn-popup-tr.popup-enter {
+  animation: popup-down-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Exit animations */
+.turn-popup-bl.popup-exit,
+.turn-popup-br.popup-exit {
+  animation: popup-up-exit 280ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+.turn-popup-tl.popup-exit,
+.turn-popup-tr.popup-exit {
+  animation: popup-down-exit 280ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes popup-up-enter   { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes popup-up-exit    { from { transform: translateY(0); }    to { transform: translateY(100%); } }
+@keyframes popup-down-enter { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes popup-down-exit  { from { transform: translateY(0); }    to { transform: translateY(-100%); } }
+
 /* Empty corner placeholder when a role isn't in the game */
 .corner-empty-slot {
   flex: 1;
