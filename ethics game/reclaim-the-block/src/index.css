@@ -876,6 +876,7 @@ html, body {
 .tv-dt {
   border-left: 3px solid var(--border);
   box-shadow: inset 2px 0 0 var(--px-dark), inset 0 2px 0 var(--px-dark);
+  justify-content: flex-end;
 }
 /* Keep the tracker content at a readable fixed width inside the wider cell */
 .tv-pm .privacy-meter-v,
