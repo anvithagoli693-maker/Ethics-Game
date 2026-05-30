@@ -879,10 +879,10 @@ html, body {
 .tv-top-center {
   display: flex;
   flex-direction: column;
-  border-bottom: 3px solid var(--border);
-  box-shadow: 0 3px 0 var(--px-dark);
-  background: var(--surface);
+  /* No solid background — only the title bar div inside has one,
+     so the unused portion of the row cell stays transparent */
   overflow: hidden;
+  pointer-events: none;   /* let clicks pass through empty area to board */
 }
 .tv-top-bar {
   display: flex;
@@ -891,7 +891,10 @@ html, body {
   padding: 0.4rem 1rem;
   gap: 1rem;
   flex-shrink: 0;
-  border-bottom: 2px solid var(--border);
+  background: var(--surface);
+  border-bottom: 3px solid var(--border);
+  box-shadow: 0 3px 0 var(--px-dark);
+  pointer-events: all;    /* restore interactivity for the bar itself */
 }
 
 /* ── Board zone (centre middle cell) ───────────────────────── */
