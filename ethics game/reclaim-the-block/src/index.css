@@ -1047,7 +1047,16 @@ input, select { font-family: inherit; }
 }
 
 /* ── Tracker cells — sit between the corner hand trays ──────── */
-.tv-pm,
+.tv-pm {
+  display: flex;
+  flex-direction: column;   /* title on top, meter+log below */
+  align-items: stretch;
+  background: var(--surface);
+  border-top: 3px solid var(--border);
+  border-bottom: 3px solid var(--border);
+  border-right: 3px solid var(--border);
+  box-shadow: inset -2px 0 0 var(--px-dark);
+}
 .tv-dt {
   display: flex;
   flex-direction: row;
@@ -1055,35 +1064,55 @@ input, select { font-family: inherit; }
   background: var(--surface);
   border-top: 3px solid var(--border);
   border-bottom: 3px solid var(--border);
-}
-.tv-pm {
-  border-right: 3px solid var(--border);
-  box-shadow: inset -2px 0 0 var(--px-dark);
-}
-.tv-dt {
   border-left: 3px solid var(--border);
   box-shadow: inset 2px 0 0 var(--px-dark);
   justify-content: flex-end;
 }
-/* Privacy meter bar: fixed 80px, centered vertically within the row */
+
+/* Label strip across the top of the left panel */
+.tv-pm-title {
+  flex-shrink: 0;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Content row: meter bar on the left, log on the right */
+.tv-pm-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+/* Privacy meter bar: fills full height of content row */
 .tv-pm .privacy-meter-v {
   flex: none;
   width: 80px;
-  align-self: center;
+  height: 100%;
 }
+/* Hide the internal title — replaced by tv-pm-title above */
+.tv-pm .meter-v-title { display: none; }
+
 /* Density tracker bar: fixed 80px, pushed to right edge */
 .tv-dt .density-tracker-v {
   flex: none;
   width: 80px;
   align-self: center;
 }
+
 /* Game log fills the remaining width of the pm cell */
 .tv-pm .game-log {
   flex: 1;
   min-width: 0;
   border-left: 2px solid var(--border);
   overflow-y: auto;
-  max-height: 100%;
 }
 
 /* ── Top center bar ─────────────────────────────────────────── */

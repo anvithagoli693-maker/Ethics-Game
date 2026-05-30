@@ -223,8 +223,11 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
 
       {/* ── LEFT SIDE: Privacy Meter + Game Log ──────────────── */}
       <div className="tv-pm side-tracker">
-        <PrivacyMeter value={state.privacyMeter} vertical />
-        <GameLog log={state.gameLog} />
+        <div className="tv-pm-title">Privacy &amp; Trust Tracker</div>
+        <div className="tv-pm-content">
+          <PrivacyMeter value={state.privacyMeter} vertical />
+          <GameLog log={state.gameLog} />
+        </div>
       </div>
 
       {/* ── TOP CENTER: Title bar + Revealed cards ────────────── */}
