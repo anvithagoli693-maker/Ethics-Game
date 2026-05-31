@@ -22,14 +22,14 @@
 }
 
 body {
-  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-family: 'Nunito', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   font-size: 14px;
 }
 
-button { cursor: pointer; font-family: inherit; }
+button { cursor: pointer; font-family: 'Pixelify Sans', 'Courier New', monospace; }
 input, select { font-family: inherit; }
 
 /* ── Setup Screen ─────────────────────────────────────────── */
@@ -544,6 +544,67 @@ input, select { font-family: inherit; }
 .dice-result span { font-size: 0.78rem; color: var(--text-muted); }
 .dice-result strong { color: var(--yellow); }
 
+/* ── Action tracker (boots + count) ──────────────────────── */
+.ap-action-tracker {
+  background: var(--surface2);
+  border: 3px solid var(--yellow);
+  box-shadow: inset 2px 2px 0 var(--px-highlight), inset -2px -2px 0 var(--px-shadow), 3px 3px 0 var(--px-dark);
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+.ap-action-boots {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 4px;
+  margin-bottom: 0.4rem;
+}
+.ap-action-boot {
+  font-size: 1.6rem;
+  line-height: 1;
+  transition: opacity 0.15s, filter 0.15s;
+  display: inline-block;
+}
+.ap-action-boot.spent {
+  opacity: 0.22;
+  filter: grayscale(1);
+}
+.ap-action-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.ap-action-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.2rem;
+  color: var(--yellow);
+  text-shadow: 2px 2px 0 var(--px-dark);
+}
+
+/* ── Share Knowledge picker ───────────────────────────────── */
+.ap-share-picker {
+  display: flex; flex-direction: column; gap: 0.45rem;
+  padding: 0.5rem;
+}
+.ap-share-title {
+  font-weight: 700; font-size: 0.78rem;
+  color: var(--text-muted); margin-bottom: 0.2rem;
+}
+.ap-share-option {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--px-dark);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem; color: var(--text); text-align: left;
+  transition: border-color 0.1s;
+}
+.ap-share-option:hover { border-color: var(--yellow); color: var(--text); }
+.ap-share-cancel {
+  background: none; border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.75rem;
+  padding: 0.3rem 0.5rem; margin-top: 0.15rem;
+  align-self: flex-start;
+}
+.ap-share-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+
 .action-buttons { display: flex; flex-direction: column; gap: 0.6rem; }
 .action-group { }
 .action-group-label {
@@ -675,14 +736,78 @@ input, select { font-family: inherit; }
   color: var(--text-muted);
 }
 
-.ap-dice-roll {
+.ap-dice-interactive {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.65rem;
-  padding: 1rem 0.65rem;
+  gap: 0.75rem;
+  padding: 1.25rem 0.65rem;
 }
-.ap-dice-prompt { font-size: 0.82rem; text-align: center; }
+.ap-dice-prompt {
+  font-size: 0.85rem; text-align: center; color: var(--text-muted);
+  min-height: 1.3em;
+}
+/* Pixel-art die wrapper */
+.ap-die-wrap {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  transform-origin: center bottom;
+}
+.ap-die-wrap:hover:not(.jitter):not(.land) .px-die-svg {
+  filter: drop-shadow(0 0 10px rgba(200,168,112,0.55));
+}
+.ap-die-wrap:active:not(.jitter):not(.land) { transform: scale(0.9) translateY(3px); }
+/* SVG pixel die — shadow drawn inside SVG, no CSS drop-shadow needed */
+.px-die-svg {
+  width: 96px; height: 96px;
+  display: block;
+  image-rendering: pixelated;
+}
+/* Rolling: rapid pixel jitter — no rotation (that looks cheap) */
+.ap-die-wrap.jitter .px-die-svg {
+  animation: px-dice-jitter 0.1s steps(1, end) infinite;
+  cursor: default;
+}
+/* Landing: squash → stretch → settle */
+.ap-die-wrap.land .px-die-svg {
+  animation: px-dice-land 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes px-dice-jitter {
+  0%   { transform: translate(-4px, -2px); }
+  25%  { transform: translate(3px,  2px);  }
+  50%  { transform: translate(-3px, 1px);  }
+  75%  { transform: translate(4px, -1px);  }
+  100% { transform: translate(-4px, -2px); }
+}
+@keyframes px-dice-land {
+  0%   { transform: scaleX(1.35) scaleY(0.65) translateY(8px);  }
+  25%  { transform: scaleX(0.8)  scaleY(1.28) translateY(-10px); }
+  50%  { transform: scaleX(1.12) scaleY(0.88) translateY(3px);  }
+  70%  { transform: scaleX(0.94) scaleY(1.06) translateY(-2px); }
+  85%  { transform: scaleX(1.02) scaleY(0.98) translateY(0);    }
+  100% { transform: scaleX(1)    scaleY(1)    translateY(0);    }
+}
+/* Sparkle particles — fan out radially on landing */
+.px-sparkle {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  pointer-events: none;
+  animation: px-sparkle-out 0.44s ease-out forwards;
+}
+.px-sparkle::after {
+  content: '✦';
+  font-size: 0.85rem;
+  color: var(--yellow);
+  text-shadow: 0 0 6px var(--yellow);
+  display: block;
+}
+@keyframes px-sparkle-out {
+  0%   { transform: translate(-50%, -50%) scale(1.6); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0); opacity: 0; }
+}
 
 /* ── Layer 1: action body (grid + end turn) ─────────────── */
 .ap-body {
@@ -1268,44 +1393,45 @@ input, select { font-family: inherit; }
   animation: pulse 1.2s infinite;
 }
 
-/* Hand row: cards fill the corner horizontally */
+/* Hand area: position:relative so absolute children resolve against it */
 .corner-hand {
+  position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 4px;
-  padding: 5px 6px;
-  overflow: hidden;          /* no scroll — cards shrink to fit */
+  min-height: 90px;
+  overflow: hidden; /* no scroll — overlap increases instead */
 }
 .corner-empty {
   color: var(--text-muted);
   font-size: 0.72rem;
-  padding: 6px;
-  align-self: center;
+  padding: 8px;
 }
 
-/* Cards in the corner: flexible width so all fit without scrolling */
+/* Card wrapper: absolutely positioned, fills full container height */
+.fan-card-wrap {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 88px;      /* fixed — never shrinks */
+  /* left and z-index come from inline style in App.tsx */
+  cursor: pointer;
+  transition: z-index 0s;
+}
+
+/* Card fills its wrapper completely */
 .corner-hand .card {
-  flex: 1 1 0;
-  min-width: 52px;
-  width: auto;
+  width: 88px !important;
+  height: 100% !important;  /* fills the top-to-bottom wrapper height */
+  min-width: 0 !important;
   overflow: hidden;
 }
-/* Keep text readable at narrow widths */
+/* Compact text for corner cards */
 .corner-hand .card-name   { font-size: 0.6rem; line-height: 1.2; padding: 3px 4px; }
 .corner-hand .card-effect { font-size: 0.55rem; padding: 0 4px 3px; }
 .corner-hand .card-top    { padding: 2px 4px; }
 .corner-hand .card-category { font-size: 0.5rem; }
-/* Hide flip button and edu content in corner — players see full card on draw */
-.corner-hand .card-flip-btn { display: none; }
-.corner-hand .card-edu      { display: none; }
-
-/* Lift effect for selected cards: in top corners (rotated 180°) the
-   transform is also rotated, so translateY(-8px) visually lifts the
-   card toward the standing player — which is the correct direction. */
-.corner-hand .card:hover { transform: translateY(-6px); }
-.corner-hand .card-selected { transform: translateY(-10px) !important; }
+.corner-hand .card-flip-btn { font-size: 0.5rem; padding: 1px; }
+.corner-hand .card-edu      { font-size: 0.55rem; padding: 4px; line-height: 1.35; }
+.corner-hand .card-selected { box-shadow: inset 1px 1px 0 var(--px-highlight), inset -1px -1px 0 var(--px-shadow), 3px 11px 0 var(--px-dark), 0 0 0 2px white !important; }
 
 /* ── Turn action popup ─────────────────────────────────────── */
 

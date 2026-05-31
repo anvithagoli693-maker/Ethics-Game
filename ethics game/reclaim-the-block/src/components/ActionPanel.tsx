@@ -23,12 +23,143 @@ interface ActionBtn {
 const DICE_FACES: Record<number, string> = { 1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅' };
 const NHCOLOR: Record<string, string> = { suburb: 'yellow', courthouse: 'blue', media: 'green', politics: 'red' };
 
+// Isometric pixel-art die — three visible faces with dots on each
+// Vertices: FTL(11,30) FTR(53,30) FBL(11,62) FBR(53,62) BTL(21,16) BTR(63,16) BBR(63,48)
+
+// Front face: 42×32 px area, 7×7 dots
+const FACE_DOTS: Record<number, [number, number][]> = {
+  1: [[28, 43]],
+  2: [[40, 33], [16, 53]],
+  3: [[40, 33], [28, 43], [16, 53]],
+  4: [[16, 33], [40, 33], [16, 53], [40, 53]],
+  5: [[16, 33], [40, 33], [28, 43], [16, 53], [40, 53]],
+  6: [[16, 33], [40, 33], [16, 43], [40, 43], [16, 53], [40, 53]],
+};
+
+// Top face: wide-flat dots (6×3 px) to suggest horizontal perspective
+const TOP_DOTS: Record<number, [number, number][]> = {
+  1: [[34, 21]],
+  2: [[22, 21], [46, 21]],
+  3: [[22, 21], [34, 21], [46, 21]],
+  4: [[22, 18], [46, 18], [22, 24], [46, 24]],
+  5: [[22, 18], [46, 18], [34, 21], [22, 25], [46, 25]],
+  6: [[22, 18], [34, 18], [46, 18], [22, 24], [34, 24], [46, 24]],
+};
+
+// Right face: tall-narrow dots (4×5 px) within the 10 px-wide shadow face
+const RIGHT_DOTS: Record<number, [number, number][]> = {
+  1: [[56, 42]],
+  2: [[56, 31], [56, 53]],
+  3: [[56, 30], [56, 42], [56, 54]],
+  4: [[54, 31], [58, 31], [54, 52], [58, 52]],
+  5: [[54, 31], [58, 31], [56, 42], [54, 53], [58, 53]],
+  6: [[54, 31], [58, 31], [54, 42], [58, 42], [54, 53], [58, 53]],
+};
+
+// Which faces appear on top and right when front shows each value (standard die conventions)
+const SIDE_FACES: Record<number, { top: number; right: number }> = {
+  1: { top: 2, right: 3 },
+  2: { top: 3, right: 6 },
+  3: { top: 2, right: 6 },
+  4: { top: 5, right: 3 },
+  5: { top: 4, right: 1 },
+  6: { top: 3, right: 5 },
+};
+
+function PixelDie({ face }: { face: number }) {
+  const frontDots = FACE_DOTS[face] ?? FACE_DOTS[1];
+  const { top: topFace, right: rightFace } = SIDE_FACES[face] ?? { top: 2, right: 3 };
+  const topDots = TOP_DOTS[topFace] ?? [];
+  const rightDots = RIGHT_DOTS[rightFace] ?? [];
+
+  return (
+    <svg className="px-die-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      {/* Ground shadow */}
+      <ellipse cx="42" cy="70" rx="25" ry="5" fill="#3a2410" opacity="0.22" />
+
+      {/* Right face fill — darkest (away from light source) */}
+      <polygon points="53,30 63,16 63,48 53,62" fill="#b09050" />
+      {/* Right face dots — tall-narrow to suggest vertical face in shadow */}
+      {rightDots.map(([x, y], i) => (
+        <rect key={`r${i}`} x={x} y={y} width="4" height="5" fill="#2a1808" rx="0.5" opacity="0.75" />
+      ))}
+
+      {/* Top face fill — lightest (catches most light) */}
+      <polygon points="21,16 63,16 53,30 11,30" fill="#f8ecc0" />
+      {/* Top face dots — wide-flat to suggest horizontal surface */}
+      {topDots.map(([x, y], i) => (
+        <rect key={`t${i}`} x={x} y={y} width="6" height="3" fill="#3a2410" rx="0.5" opacity="0.75" />
+      ))}
+
+      {/* Front face fill — medium brightness */}
+      <polygon points="11,30 53,30 53,62 11,62" fill="#e8d4a0" />
+
+      {/* Inner highlight — top and left edges of front face */}
+      <line x1="12" y1="30" x2="52" y2="30" stroke="#fffae0" strokeWidth="1.5" opacity="0.65" />
+      <line x1="11" y1="31" x2="11" y2="61" stroke="#fffae0" strokeWidth="1.5" opacity="0.5" />
+      {/* Inner shadow — bottom and right edges of front face */}
+      <line x1="12" y1="62" x2="52" y2="62" stroke="#9a7840" strokeWidth="1" opacity="0.4" />
+      <line x1="53" y1="31" x2="53" y2="61" stroke="#9a7840" strokeWidth="1" opacity="0.4" />
+
+      {/* Top face left-slope highlight */}
+      <line x1="21" y1="16" x2="11" y2="30" stroke="#fff8e0" strokeWidth="1" opacity="0.6" />
+
+      {/* Pixel-art outlines for all three faces */}
+      <polygon points="21,16 63,16 53,30 11,30" fill="none" stroke="#3a2410" strokeWidth="1.5" />
+      <polygon points="11,30 53,30 53,62 11,62" fill="none" stroke="#3a2410" strokeWidth="1.5" />
+      <polygon points="53,30 63,16 63,48 53,62" fill="none" stroke="#3a2410" strokeWidth="1.5" />
+
+      {/* Front face dots — full size, most prominent */}
+      {frontDots.map(([x, y], i) => (
+        <rect key={i} x={x} y={y} width="7" height="7" fill="#3a2410" rx="1" />
+      ))}
+    </svg>
+  );
+}
+
+// Sparkle directions: 8 points of the compass, ~44px radius
+const SPARKLE_DIRS = [
+  { tx: 0, ty: -44 }, { tx: 31, ty: -31 }, { tx: 44, ty: 0 }, { tx: 31, ty: 31 },
+  { tx: 0, ty: 44 },  { tx: -31, ty: 31 }, { tx: -44, ty: 0 }, { tx: -31, ty: -31 },
+];
+
 export default function ActionPanel({
   state, selectedCardIds, selectedNeighborhood, selectedSlot, dispatch, onClearSelection,
 }: Props) {
   const { phase, actionsRemaining, currentPlayerIndex, players, pendingIncident, pendingDiscard } = state;
   const player = players[currentPlayerIndex];
   const actions = actionsRemaining;
+
+  // ── Share Knowledge picker state ─────────────────────────────────────────
+  const [shareStep, setShareStep] = useState<'idle' | 'pick-player' | 'pick-card'>('idle');
+  const [shareTargetId, setShareTargetId] = useState<number | null>(null);
+
+  // ── Dice animation state ─────────────────────────────────────────────────
+  const [rolling, setRolling] = useState(false);
+  const [landed, setLanded] = useState(false);
+  const [rollingFace, setRollingFace] = useState(6);
+  const rollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function handleDiceTap() {
+    if (rolling || landed) return;
+    const finalRoll = Math.floor(Math.random() * 6) + 1;
+    setRolling(true);
+    setLanded(false);
+    let step = 0;
+    const totalSteps = 14;
+    rollTimer.current = setInterval(() => {
+      step++;
+      setRollingFace(Math.floor(Math.random() * 6) + 1);
+      if (step >= totalSteps) {
+        clearInterval(rollTimer.current!);
+        setRollingFace(finalRoll);
+        setRolling(false);
+        setLanded(true);
+        // Short pause so the landing bounce plays before the action tracker appears
+        setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), 450);
+      }
+    }, 80);
+  }
 
   // ── Hold-for-tooltip state ───────────────────────────────────────────────
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
@@ -85,6 +216,9 @@ export default function ActionPanel({
 
   const canPlayCard = canAct && selectedCards.length === 1 && selectedCards[0].isPowerUp;
   const canSpecial = canAct && !player.hasUsedSpecialAbilityThisTurn;
+
+  const colocatedPlayers = players.filter((p) => p.id !== player.id && p.position === player.position);
+  const canShare = canAct && colocatedPlayers.length > 0 && player.hand.length > 0;
 
   // ── Action button definitions ────────────────────────────────────────────
   const nhColorNeeded = selectedNeighborhood ? NHCOLOR[selectedNeighborhood] : null;
@@ -186,6 +320,18 @@ export default function ActionPanel({
       available: canSpecial,
       onTap: () => dispatch({ type: 'USE_SPECIAL_ABILITY' }),
     } as ActionBtn] : []),
+    {
+      id: 'share',
+      icon: '🤝',
+      label: 'Share Knowledge',
+      tooltip: [
+        'Cost: 1 action.',
+        'Give 1 Community Card to a teammate on your tile.',
+        'Both players must occupy the exact same space.',
+      ].join('\n'),
+      available: canShare,
+      onTap: () => setShareStep('pick-player'),
+    },
   ];
 
   // Tooltip lookup including End Turn
@@ -209,11 +355,26 @@ export default function ActionPanel({
           {phase === 'player-turn' && !state.pendingDiceRoll && state.lastDiceRoll !== null && (
             <span className="ap-chip ap-chip-dice">{DICE_FACES[state.lastDiceRoll]} {state.lastDiceRoll}</span>
           )}
-          {phase === 'player-turn' && !state.pendingDiceRoll && (
-            <span className="ap-chip ap-chip-actions">⚡ {actions}</span>
-          )}
         </div>
       </div>
+
+      {/* ── Action tracker — replaces the old ⚡ chip ──────────── */}
+      {phase === 'player-turn' && !state.pendingDiceRoll && !pendingIncident && !pendingDiscard && (() => {
+        const total = Math.max(state.lastDiceRoll ?? actions, actions);
+        return (
+          <div className="ap-action-tracker">
+            <div className="ap-action-boots">
+              {Array.from({ length: total }).map((_, i) => (
+                <span key={i} className={`ap-action-boot${i < actions ? '' : ' spent'}`}>👢</span>
+              ))}
+            </div>
+            <div className="ap-action-count">
+              <span className="ap-action-num">{actions}</span>
+              <span className="ap-action-sep"> / {total} Actions Remaining</span>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Incident resolution ─────────────────────────────── */}
       {pendingIncident && (
@@ -294,58 +455,114 @@ export default function ActionPanel({
 
       {/* ── Dice roll ───────────────────────────────────────── */}
       {phase === 'player-turn' && state.pendingDiceRoll && !pendingIncident && (
-        <div className="ap-dice-roll">
-          <div className="ap-dice-prompt">🎲 Roll to start your turn!</div>
-          <button className="btn btn-roll" onClick={() => dispatch({ type: 'ROLL_DIE' })}>
-            🎲 Roll Dice
-          </button>
+        <div className="ap-dice-interactive">
+          <div className="ap-dice-prompt">
+            {rolling ? 'Rolling…' : landed ? `Rolled ${rollingFace}!` : 'Tap to roll!'}
+          </div>
+          <div
+            className={`ap-die-wrap${rolling ? ' jitter' : landed ? ' land' : ''}`}
+            onClick={handleDiceTap}
+            role="button"
+            aria-label="Roll dice"
+          >
+            <PixelDie face={rollingFace} />
+            {landed && SPARKLE_DIRS.map((dir, i) => (
+              <span
+                key={i}
+                className="px-sparkle"
+                style={{ '--tx': `${dir.tx}px`, '--ty': `${dir.ty}px` } as React.CSSProperties}
+              />
+            ))}
+          </div>
         </div>
       )}
 
-      {/* ── Action grid (Layer 1 + 2) ────────────────────────── */}
+      {/* ── Action grid / Share Knowledge picker ───────────────── */}
       {phase === 'player-turn' && !state.pendingDiceRoll && !pendingIncident && !pendingDiscard && (
         <div className="ap-body">
 
-          {/* Layer 2: tooltip (shown while holding any button) */}
-          {tooltipEntry && (
-            <div className="ap-tooltip">
-              <div className="ap-tooltip-title">{tooltipEntry.icon} {tooltipEntry.label}</div>
-              {tooltipEntry.tooltip.split('\n').map((line, i) => (
-                <div key={i} className="ap-tooltip-line">{line || <>&nbsp;</>}</div>
-              ))}
+          {shareStep !== 'idle' ? (
+            /* ── Share Knowledge multi-step picker ── */
+            <div className="ap-share-picker">
+              {shareStep === 'pick-player' ? (
+                <>
+                  <div className="ap-share-title">🤝 Who to share with?</div>
+                  {colocatedPlayers.map((p) => (
+                    <button
+                      key={p.id}
+                      className="ap-share-option"
+                      style={{ borderColor: p.role.colorHex }}
+                      onClick={() => { setShareTargetId(p.id); setShareStep('pick-card'); }}
+                    >
+                      {p.role.emoji} {p.role.name}
+                    </button>
+                  ))}
+                  <button className="ap-share-cancel" onClick={() => setShareStep('idle')}>✕ Cancel</button>
+                </>
+              ) : (
+                <>
+                  <div className="ap-share-title">🤝 Which card to give?</div>
+                  {player.hand.map((card) => (
+                    <button
+                      key={card.id}
+                      className="ap-share-option"
+                      onClick={() => {
+                        dispatch({ type: 'SHARE_KNOWLEDGE', fromPlayerId: player.id, toPlayerId: shareTargetId!, cardId: card.id });
+                        setShareStep('idle');
+                        setShareTargetId(null);
+                      }}
+                    >
+                      <span className={`card-dot cat-${card.category}`} /> {card.name}
+                    </button>
+                  ))}
+                  <button className="ap-share-cancel" onClick={() => { setShareStep('pick-player'); setShareTargetId(null); }}>← Back</button>
+                </>
+              )}
             </div>
-          )}
+          ) : (
+            <>
+              {/* Layer 2: tooltip (shown while holding any button) */}
+              {tooltipEntry && (
+                <div className="ap-tooltip">
+                  <div className="ap-tooltip-title">{tooltipEntry.icon} {tooltipEntry.label}</div>
+                  {tooltipEntry.tooltip.split('\n').map((line, i) => (
+                    <div key={i} className="ap-tooltip-line">{line || <>&nbsp;</>}</div>
+                  ))}
+                </div>
+              )}
 
-          {/* Layer 1: action button grid */}
-          <div className="ap-grid">
-            {actionButtons.map((btn) => (
+              {/* Layer 1: action button grid */}
+              <div className="ap-grid">
+                {actionButtons.map((btn) => (
+                  <button
+                    key={btn.id}
+                    className={`ap-action-btn${btn.available ? '' : ' ap-disabled'}`}
+                    onPointerDown={() => startHold(btn.id)}
+                    onPointerUp={endHold}
+                    onPointerLeave={endHold}
+                    onPointerCancel={endHold}
+                    onClick={() => { if (!tooltipShown.current && btn.available) btn.onTap(); }}
+                  >
+                    <span className="ap-btn-icon">{btn.icon}</span>
+                    <span className="ap-btn-label">{btn.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* End Turn — always last, largest button */}
               <button
-                key={btn.id}
-                className={`ap-action-btn${btn.available ? '' : ' ap-disabled'}`}
-                onPointerDown={() => startHold(btn.id)}
+                className="ap-end-turn"
+                onPointerDown={() => startHold('endturn')}
                 onPointerUp={endHold}
                 onPointerLeave={endHold}
                 onPointerCancel={endHold}
-                onClick={() => { if (!tooltipShown.current && btn.available) btn.onTap(); }}
+                onClick={() => { if (!tooltipShown.current) { dispatch({ type: 'END_TURN' }); onClearSelection(); } }}
               >
-                <span className="ap-btn-icon">{btn.icon}</span>
-                <span className="ap-btn-label">{btn.label}</span>
+                ✅ End Turn
+                <span className="ap-end-sub">draw 2 cards</span>
               </button>
-            ))}
-          </div>
-
-          {/* End Turn — always last, largest button */}
-          <button
-            className="ap-end-turn"
-            onPointerDown={() => startHold('endturn')}
-            onPointerUp={endHold}
-            onPointerLeave={endHold}
-            onPointerCancel={endHold}
-            onClick={() => { if (!tooltipShown.current) { dispatch({ type: 'END_TURN' }); onClearSelection(); } }}
-          >
-            ✅ End Turn
-            <span className="ap-end-sub">draw 2 cards</span>
-          </button>
+            </>
+          )}
         </div>
       )}
     </div>

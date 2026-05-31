@@ -25,6 +25,8 @@ function CornerPanel({
   selectedCardIds: string[];
   onCardClick: (card: CommunityCard) => void;
 }) {
+  const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
+
   const POSITION_SHORT: Record<string, string> = {
     'city-hall': 'City Hall',
     suburb: 'Suburb', courthouse: 'Courthouse', media: 'Media', politics: 'Politics',
@@ -35,6 +37,10 @@ function CornerPanel({
     'suburb-road-1': 'Sub Road', 'courthouse-road-1': 'Court Road',
     'media-road-1': 'Med Road', 'politics-road-1': 'Pol Road',
   };
+
+  // Horizontal overlap layout: cards spread evenly, overlap increases with hand size
+  const n = player.hand.length;
+  const CARD_W = 88; // px, fixed — never shrinks
 
   return (
     <div
@@ -51,18 +57,37 @@ function CornerPanel({
         {isActive && <span className="corner-active-badge">⚡ ACTIVE</span>}
       </div>
       <div className="corner-hand">
-        {player.hand.length === 0 ? (
+        {n === 0 ? (
           <span className="corner-empty">No cards in hand</span>
         ) : (
-          player.hand.map((card) => (
-            <CardDisplay
-              key={card.id}
-              card={card}
-              isSelected={selectedCardIds.includes(card.id)}
-              onClick={() => onCardClick(card)}
-              disabled={!isActive}
-            />
-          ))
+          player.hand.map((card, i) => {
+            const isFocused = focusedCardId === card.id;
+            // Spread cards evenly across the container width using CSS calc.
+            // As n grows the step shrinks → overlap increases, no scroll needed.
+            const left = n === 1
+              ? `calc(50% - ${CARD_W / 2}px)`
+              : `calc((100% - ${CARD_W}px) * ${i / (n - 1)})`;
+            return (
+              <div
+                key={card.id}
+                className={`fan-card-wrap${isFocused ? ' fan-focused' : ''}`}
+                style={{
+                  left,
+                  zIndex: isFocused ? 30 : i + 1,
+                }}
+              >
+                <CardDisplay
+                  card={card}
+                  isSelected={selectedCardIds.includes(card.id)}
+                  onClick={() => {
+                    setFocusedCardId(focusedCardId === card.id ? null : card.id);
+                    onCardClick(card);
+                  }}
+                  disabled={!isActive}
+                />
+              </div>
+            );
+          })
         )}
       </div>
     </div>

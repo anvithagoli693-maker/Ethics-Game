@@ -141,12 +141,26 @@ export function buildInitialState(playerCount: 2 | 3 | 4): GameState {
     return { ...p, hand };
   });
 
-  const neighborhoods = [
-    { id: 'suburb' as NeighborhoodId, name: 'Suburb', slots: ['ring' as DeviceType, null, null, null], densityTrack: 1 },
-    { id: 'courthouse' as NeighborhoodId, name: 'Courthouse', slots: ['ring' as DeviceType, null, null, null], densityTrack: 1 },
-    { id: 'media' as NeighborhoodId, name: 'Media District', slots: ['ring' as DeviceType, null, null, null], densityTrack: 1 },
-    { id: 'politics' as NeighborhoodId, name: 'Politics Row', slots: ['ring' as DeviceType, null, null, null], densityTrack: 1 },
+  // Randomly place 4 starting ring devices; skip slot 0 (N1) because all players start there
+  const eligibleSlots: { nhIdx: number; slot: SlotIndex }[] = [];
+  for (let nhIdx = 0; nhIdx < 4; nhIdx++) {
+    for (let slot = 1; slot <= 3; slot++) {
+      eligibleSlots.push({ nhIdx, slot: slot as SlotIndex });
+    }
+  }
+  const startingPlacements = shuffle(eligibleSlots).slice(0, 4);
+
+  const NEIGHBORHOOD_DEFS = [
+    { id: 'suburb' as NeighborhoodId, name: 'Suburb' },
+    { id: 'courthouse' as NeighborhoodId, name: 'Courthouse' },
+    { id: 'media' as NeighborhoodId, name: 'Media District' },
+    { id: 'politics' as NeighborhoodId, name: 'Politics Row' },
   ];
+  const neighborhoods = NEIGHBORHOOD_DEFS.map((def, nhIdx) => {
+    const slots: (DeviceType | null)[] = [null, null, null, null];
+    startingPlacements.filter((p) => p.nhIdx === nhIdx).forEach((p) => { slots[p.slot] = 'ring'; });
+    return { ...def, slots, densityTrack: slots.filter(Boolean).length };
+  });
 
   return {
     phase: 'journalist-preview',
@@ -191,11 +205,12 @@ export function buildInitialState(playerCount: 2 | 3 | 4): GameState {
 
 export type GameAction =
   | { type: 'JOURNALIST_PREVIEW_DONE' }
-  | { type: 'ROLL_DIE' }
+  | { type: 'ROLL_DIE'; precomputedRoll?: number }
   | { type: 'MOVE'; to: Position }
   | { type: 'REMOVE_DEVICE'; neighborhoodId: NeighborhoodId; slotIndex: SlotIndex; cardIds: [string, string] }
   | { type: 'LEGAL_REMOVE_DEVICE'; neighborhoodId: NeighborhoodId; slotIndex: SlotIndex; cardIds: [string, string] }
   | { type: 'SWAP_CARDS'; withPlayerId: number; giveCardIds: string[]; takeCardIds: string[] }
+  | { type: 'SHARE_KNOWLEDGE'; fromPlayerId: number; toPlayerId: number; cardId: string }
   | { type: 'PLAY_CARD'; cardId: string; targetNeighborhoodId?: NeighborhoodId; targetSlotIndex?: SlotIndex; targetPlayerId?: number; chosenPosition?: Position }
   | { type: 'DEPOSIT_AT_CITY_HALL'; cardIds: string[] }
   | { type: 'USE_SPECIAL_ABILITY'; targetNeighborhoodId?: NeighborhoodId; targetSlotIndex?: SlotIndex; revealCount?: number }
@@ -738,7 +753,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     // ── Roll die (start of player turn) ───────────────────────────────
     case 'ROLL_DIE': {
       if (!state.pendingDiceRoll) return state;
-      const roll = Math.floor(Math.random() * 6) + 1;
+      const roll = action.precomputedRoll ?? (Math.floor(Math.random() * 6) + 1);
       let s: GameState = {
         ...state,
         actionsRemaining: roll + state.pendingExtraActions,
@@ -838,6 +853,26 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       let s = spendActions({ ...state, players }, 1);
       s = log(s, `${player.role.name} swapped cards with ${other.role.name}`);
+      return s;
+    }
+
+    // ── Share Knowledge (give 1 card to co-located player, costs 1 action) ──
+    case 'SHARE_KNOWLEDGE': {
+      if (state.actionsRemaining < 1) return state;
+      const from = state.players[state.currentPlayerIndex];
+      if (from.id !== action.fromPlayerId) return state;
+      const to = state.players.find((p) => p.id === action.toPlayerId);
+      if (!to || from.position !== to.position) return state;
+      const card = from.hand.find((c) => c.id === action.cardId);
+      if (!card) return state;
+
+      const players = state.players.map((p) => {
+        if (p.id === action.fromPlayerId) return { ...p, hand: p.hand.filter((c) => c.id !== action.cardId) };
+        if (p.id === action.toPlayerId)   return { ...p, hand: [...p.hand, card] };
+        return p;
+      });
+      let s = spendActions({ ...state, players }, 1);
+      s = log(s, `${from.role.name} shared "${card.name}" with ${to.role.name}`);
       return s;
     }
 
