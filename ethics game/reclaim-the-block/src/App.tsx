@@ -587,12 +587,17 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
       )}
 
       {/* ── Drawn cards popup overlay ─────────────────────────── */}
-      {state.pendingDrawnCards && (
+      {state.pendingDrawnCards && (() => {
+        const drawingPlayer = state.players.find((p) => p.id === state.pendingDrawnCards!.playerId);
+        // Top-corner players (organizer = TL, captain = TR) read upside-down,
+        // so flip the popup to face them.
+        const facesTop = drawingPlayer?.role.id === 'organizer' || drawingPlayer?.role.id === 'captain';
+        return (
         <div className="drawn-cards-overlay">
-          <div className="drawn-cards-modal">
+          <div className={`drawn-cards-modal${facesTop ? ' drawn-cards-modal-rotated' : ''}`}>
             <div className="drawn-cards-title">
-              {state.players.find((p) => p.id === state.pendingDrawnCards!.playerId)?.role.emoji}{' '}
-              {state.players.find((p) => p.id === state.pendingDrawnCards!.playerId)?.role.name} drew{' '}
+              {drawingPlayer?.role.emoji}{' '}
+              {drawingPlayer?.role.name} drew{' '}
               {state.pendingDrawnCards.cards.length} card
               {state.pendingDrawnCards.cards.length !== 1 ? 's' : ''}
             </div>
@@ -617,7 +622,8 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
             </button>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
