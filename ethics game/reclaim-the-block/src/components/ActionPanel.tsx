@@ -159,9 +159,14 @@ export default function ActionPanel({
           setRollingFace(finalRoll);
           setRolling(false);
           setLanded(true);
+          // Landing buzz — longer pulse to signal the final number
+          navigator.vibrate?.([60, 30, 60]);
           setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), 450);
         } else {
           setRollingFace(Math.floor(Math.random() * 6) + 1);
+          // Short tick vibration on each face change, gets slightly longer as it slows down
+          const buzzLen = Math.round(8 + t * 14);
+          navigator.vibrate?.(buzzLen);
           scheduleStep(step + 1);
         }
       }, delay);
