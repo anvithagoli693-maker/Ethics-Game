@@ -829,7 +829,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       let s = removeCardFromHand(state, player.id, action.cardIds);
       s = removeDeviceFromSlot(s, action.neighborhoodId, action.slotIndex);
-      s = shiftMeter(s, 1, `Legal Advocate removed device from ${n.name}`);
+      s = shiftMeter(s, 1, `Lawyer removed device from ${n.name}`);
       s = spendActions(s, 1);
       const players = s.players.map((p) =>
         p.id === player.id ? { ...p, hasUsedSpecialAbilityThisTurn: true } : p
@@ -980,7 +980,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
         case 'captain': {
           // Handled via CAPTAIN_REVERSE_OVERFLOW
-          s = log(s, 'Use the Neighborhood Captain ability via the Reverse Overflow action.');
+          s = log(s, 'Use the Parent ability via the Reverse Overflow action.');
           break;
         }
         case 'council': {
@@ -990,7 +990,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
         case 'legal': {
           // Handled via LEGAL_REMOVE_DEVICE
-          s = log(s, 'Use Legal Advocate ability via the Remove Device (any 2 cards) action.');
+          s = log(s, 'Use Lawyer ability via the Remove Device (any 2 cards) action.');
           break;
         }
       }

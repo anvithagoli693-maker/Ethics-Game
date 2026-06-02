@@ -324,7 +324,7 @@ export default function ActionPanel({
       label: 'Legal Remove',
       tooltip: [
         'Cost: 1 action + 2 cards of DIFFERENT colors (once per turn).',
-        'Legal Advocate special ability.',
+        'Lawyer special ability.',
         'Remove a device from ANY neighborhood.',
         'Select 2 different-color cards and a device slot.',
       ].join('\n'),
@@ -345,7 +345,7 @@ export default function ActionPanel({
       label: 'Reverse Overflow',
       tooltip: [
         'Cost: 1 action + discard any 2 cards (once per turn).',
-        'Neighborhood Captain special ability.',
+        'Parent special ability.',
         'Lower the Surveillance Density Tracker by 1.',
         'Select any 2 cards to discard.',
       ].join('\n'),
