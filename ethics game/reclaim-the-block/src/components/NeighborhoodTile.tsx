@@ -34,6 +34,16 @@ const NEIGHBORHOOD_COLORS: Record<string, string> = {
   politics: '#ef4444',
 };
 
+// Landmark that gives each district its identity (Pelican-Town style).
+// Placeholder emoji — swap `.district-landmark.lm-<id>` to a background
+// sprite in CSS later without touching this component.
+const LANDMARK_EMOJI: Record<string, string> = {
+  suburb: '🏘️',      // Community center / residential
+  courthouse: '⚖️',   // Courthouse
+  media: '📰',        // News office
+  politics: '🗳️',     // Government / political building
+};
+
 const SLOT_LABELS = ['N1', 'N2', 'N3', 'N4'];
 
 function slotPositionOf(position: string, neighborhoodId: string): number | null {
@@ -65,7 +75,7 @@ export default function NeighborhoodTile({
 
   return (
     <div
-      className={`neighborhood-tile ${isSelected ? 'selected' : ''} ${filledSlots === 4 ? 'full' : ''} ${tileMoveable ? 'moveable' : ''}`}
+      className={`neighborhood-tile district-${neighborhood.id} ${isSelected ? 'selected' : ''} ${filledSlots === 4 ? 'full' : ''} ${tileMoveable ? 'moveable' : ''}`}
       style={{ borderColor: color }}
       onClick={() => {
         if (tileMoveable) onMove(roadTile);
@@ -84,8 +94,18 @@ export default function NeighborhoodTile({
         ))}
       </div>
 
-      {/* 2×2 device slots with roads on all 4 sides forming a square ring */}
+      {/* Decorative trees scattered around the district (purely cosmetic) */}
+      <span className="district-tree dt-1" aria-hidden="true">🌳</span>
+      <span className="district-tree dt-2" aria-hidden="true">🌲</span>
+      <span className="district-tree dt-3" aria-hidden="true">🌳</span>
+
+      {/* Houses (device slots) scattered around the landmark, linked by paths */}
       <div className="device-slots-square">
+        {/* Central landmark — the district's identity. Swap to a sprite via
+            .district-landmark.lm-<id> { background-image: url(...) } later. */}
+        <div className={`district-landmark lm-${neighborhood.id}`} aria-hidden="true">
+          {LANDMARK_EMOJI[neighborhood.id]}
+        </div>
         {/* Render helper: a device slot */}
         {([0, 1, 2, 3] as const).map((i) => {
           const slotPos = `${neighborhood.id}-n${i + 1}` as Position;
