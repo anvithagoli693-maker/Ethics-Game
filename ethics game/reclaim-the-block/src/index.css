@@ -1211,7 +1211,7 @@ input, select { font-family: inherit; }
 
 .card-name { padding: 2px 5px 1px; font-family: 'Press Start 2P', monospace; font-size: 0.1rem; line-height: 1.5; color: var(--px-dark); }
 .card-desc {
-  padding: 0 5px 2px; font-size: 0.52rem; line-height: 1.3; color: var(--text-muted); font-style: italic;
+  padding: 0 5px 2px; font-size: 0.38rem; line-height: 1.3; color: var(--text-muted); font-style: italic;
   overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
 }
 .card-effect { padding: 0 5px 3px; font-size: 0.44rem; font-weight: 600; color: var(--text); line-height: 1.3; border-top: 1px solid rgba(0,0,0,0.12); }
