@@ -448,7 +448,7 @@ input, select { font-family: inherit; }
   border: 2px solid var(--px-dark);
   border-radius: 2px;
   box-shadow: 2px 2px 0 var(--px-dark);
-  font-size: 0.7rem;
+  font-size: 1.4rem;
   z-index: 1;
 }
 .road-waypoint.moveable { cursor: pointer; border-color: var(--blue); box-shadow: 2px 2px 0 var(--px-dark), 0 0 0 1px var(--blue); }
@@ -637,8 +637,8 @@ input, select { font-family: inherit; }
 .device-slot.slot-removeable { cursor: pointer; outline: 2px dashed var(--red); outline-offset: -2px; }
 .device-token { font-size: 1.1rem; }
 .slot-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
-.slot-pawns { display: flex; gap: 1px; line-height: 1; }
-.slot-pawn { font-size: 0.75rem; }
+.slot-pawns { display: flex; gap: 2px; line-height: 1; }
+.slot-pawn { font-size: 1.2rem; }
 
 .density-row { display: flex; gap: 3px; margin-bottom: 4px; width: 96px; }
 .density-pip { flex: 1; height: 5px; background: var(--surface2); border: 1px solid var(--border); }
@@ -1670,7 +1670,7 @@ input, select { font-family: inherit; }
 .tv-game .neighborhood-name { font-size: 0.7rem; }
 .tv-game .neighborhood-density { font-size: 0.7rem; }
 .tv-game .device-token { font-size: 1.35rem; }
-.tv-game .slot-pawn { font-size: 0.95rem; }
+.tv-game .slot-pawn { font-size: 1.6rem; }
 .tv-game .density-row { margin-bottom: 2px; }
 
 /* ── Bottom center (action panel + game log side by side) ──── */
