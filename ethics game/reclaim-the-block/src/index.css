@@ -429,22 +429,24 @@ input, select { font-family: inherit; }
 .board-roads-top, .board-roads-bottom { display: flex; justify-content: center; height: 60px; }
 .road-segment-v { display: flex; flex-direction: column; align-items: center; }
 .road-segment-h { display: flex; flex-direction: row; align-items: center; }
+/* Connecting roads — same tan street + dark pixel outline as neighborhood roads */
 .road-line-v {
-  width: 6px; flex: 1;
-  background: #9a7850;
-  box-shadow: 1px 0 0 #6e5430, -1px 0 0 #c4a070;
+  width: 8px; flex: 1;
+  background: #c8a060;
+  box-shadow: 2px 0 0 var(--px-dark), -2px 0 0 var(--px-dark);
 }
 .road-line-h {
-  height: 6px; width: 14px;
-  background: #9a7850;
-  box-shadow: 0 1px 0 #6e5430, 0 -1px 0 #c4a070;
+  height: 8px; width: 16px;
+  background: #c8a060;
+  box-shadow: 0 2px 0 var(--px-dark), 0 -2px 0 var(--px-dark);
 }
 .road-waypoint {
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
   width: 28px; height: 28px;
   background: #d4b880;
-  border: 2px solid #9a7850;
+  border: 2px solid var(--px-dark);
+  border-radius: 2px;
   box-shadow: 2px 2px 0 var(--px-dark);
   font-size: 0.7rem;
   z-index: 1;
@@ -452,8 +454,8 @@ input, select { font-family: inherit; }
 .road-waypoint.moveable { cursor: pointer; border-color: var(--blue); box-shadow: 2px 2px 0 var(--px-dark), 0 0 0 1px var(--blue); }
 .road-waypoint.moveable:hover { box-shadow: 2px 2px 0 var(--px-dark), 0 0 0 2px var(--blue), 0 0 10px rgba(30,90,176,0.25); }
 .road-waypoint.active-player-here { border-color: var(--px-dark); box-shadow: 2px 2px 0 var(--px-dark), 0 0 0 2px var(--px-dark); }
-.road-v { width: 6px; height: 100%; background: #9a7850; }
-.road-h { height: 6px; width: 40px; background: #9a7850; }
+.road-v { width: 8px; height: 100%; background: #c8a060; box-shadow: 2px 0 0 var(--px-dark), -2px 0 0 var(--px-dark); }
+.road-h { height: 8px; width: 40px; background: #c8a060; box-shadow: 0 2px 0 var(--px-dark), 0 -2px 0 var(--px-dark); }
 
 .board-middle { display: flex; align-items: center; gap: 0; width: 100%; justify-content: center; }
 .city-hall-area { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
@@ -483,8 +485,11 @@ input, select { font-family: inherit; }
 /* District — no box. A soft cleared-ground patch under the cluster that
    fades into the grass, with the houses/landmark/trees sitting on top. */
 .neighborhood-tile {
-  background: radial-gradient(ellipse 72% 64% at 50% 58%, rgba(168,138,80,0.42) 0%, rgba(168,138,80,0.18) 52%, transparent 74%);
+  /* No container — the district sits directly on the board terrain, defined only
+     by its streets, houses, trees, and landmark. No box, border, panel, or ellipse. */
+  background: none;
   border: none;
+  border-radius: 0;
   box-shadow: none;
   padding: 0.5rem 0.5rem 0.25rem;
   cursor: pointer;
@@ -532,13 +537,13 @@ input, select { font-family: inherit; }
   width: 100%; height: 152px;
   margin-bottom: 2px;
 }
-/* The connecting path — an organic dirt loop the houses sit on */
+/* The connecting street — a square tan path loop the houses front onto. */
 .device-slots-square::before {
   content: '';
   position: absolute;
   inset: 26px 24px;
   border: 7px solid #c8a060;
-  border-radius: 56% 44% 52% 48% / 48% 54% 46% 52%;
+  border-radius: 5px;
   box-shadow: 0 0 0 2px var(--px-dark), inset 0 0 0 2px var(--px-dark);
   z-index: 0;
 }
@@ -583,7 +588,7 @@ input, select { font-family: inherit; }
 .int-road-seg.seg-h, .int-road-seg.seg-v { display: flex; align-items: center; justify-content: center; }
 .int-waypoint {
   width: 18px; height: 18px; flex-shrink: 0; position: relative; z-index: 1;
-  border-radius: 50%;
+  border-radius: 2px;
   background: #d4b880; border: 2px solid var(--px-dark); box-shadow: 2px 2px 0 var(--px-dark);
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 0.6rem;
 }
@@ -1400,7 +1405,7 @@ input, select { font-family: inherit; }
   height: 100vh;
   overflow: hidden;
   display: grid;
-  /* Narrower corner columns free up more map space in the center */
+  /* Corner columns sized for the player hands; board fills the center cell */
   grid-template-columns: 23vw 1fr 23vw;
   grid-template-rows: 20vh 1fr 22vh;
   grid-template-areas:
@@ -1524,7 +1529,7 @@ input, select { font-family: inherit; }
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
-  padding: 0.25rem 0.5rem;
+  padding: 0.15rem 0.25rem;
 }
 
 /* Shared tracker bars on the board's top & bottom edges.
@@ -1548,57 +1553,59 @@ input, select { font-family: inherit; }
    Original board is ~800px tall, so we target ≈72% scale. */
 .tv-game .board-area {
   flex: none;                 /* don't stretch in flex parent */
-  padding: 0.5rem;
+  padding: 0.25rem;
   overflow: hidden;
 }
 .tv-game .neighborhood-tile {
-  width: 176px;
-  min-width: 160px;
+  width: 228px;
+  min-width: 210px;
   padding: 0.35rem 0.35rem 0.2rem;
 }
 /* Hide the baseline (always-on) device decorations to save vertical space */
 .tv-game .baseline-devices { display: none; }
 
 .tv-game .device-slots-square {
-  height: 132px;
+  height: 176px;
   margin-bottom: 2px;
 }
 .tv-game .device-slots-square::before {
-  inset: 22px 18px;
-  border-width: 6px;
+  inset: 28px 24px;
+  border-width: 7px;
 }
-.tv-game .device-slot { height: 32px; }
+.tv-game .device-slot { height: 42px; }
 .tv-game .device-slot.sq-slot-1,
 .tv-game .device-slot.sq-slot-2,
 .tv-game .device-slot.sq-slot-3,
-.tv-game .device-slot.sq-slot-4 { width: 40px; }
-.tv-game .district-landmark { width: 38px; height: 38px; font-size: 1.5rem; }
-.tv-game .district-tree { font-size: 0.85rem; }
+.tv-game .device-slot.sq-slot-4 { width: 54px; }
+.tv-game .district-landmark { width: 50px; height: 50px; font-size: 2rem; }
+.tv-game .district-tree { font-size: 1.05rem; }
 .tv-game .int-waypoint {
-  width: 16px;
-  height: 16px;
-}
-.tv-game .road-waypoint {
   width: 24px;
   height: 24px;
 }
+.tv-game .road-waypoint {
+  width: 32px;
+  height: 32px;
+}
 .tv-game .board-roads-top,
 .tv-game .board-roads-bottom {
-  height: 46px;
+  height: 56px;
 }
 .tv-game .city-hall {
-  min-width: 82px;
-  padding: 0.5rem;
+  min-width: 104px;
+  padding: 0.65rem;
 }
-.tv-game .city-hall-label { font-size: 0.6rem; }
-.tv-game .city-hall-sublabel { font-size: 0.52rem; }
-.tv-game .city-hall-players { font-size: 1rem; margin-top: 2px; }
+.tv-game .city-hall-label { font-size: 0.72rem; }
+.tv-game .city-hall-sublabel { font-size: 0.6rem; }
+.tv-game .city-hall-players { font-size: 1.2rem; margin-top: 2px; }
 .tv-game .neighborhood-header {
   margin: 0 0 2px;
-  padding: 2px 8px;
+  padding: 3px 10px;
 }
-.tv-game .neighborhood-name { font-size: 0.58rem; }
-.tv-game .neighborhood-density { font-size: 0.58rem; }
+.tv-game .neighborhood-name { font-size: 0.7rem; }
+.tv-game .neighborhood-density { font-size: 0.7rem; }
+.tv-game .device-token { font-size: 1.35rem; }
+.tv-game .slot-pawn { font-size: 0.95rem; }
 .tv-game .density-row { margin-bottom: 2px; }
 
 /* ── Bottom center (action panel + game log side by side) ──── */
