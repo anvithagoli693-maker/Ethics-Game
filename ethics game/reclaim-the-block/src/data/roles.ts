@@ -18,6 +18,7 @@ export const ROLES: Role[] = [
     color: 'blue',
     colorHex: '#3b82f6',
     emoji: '🔵',
+    characterImage: '/characters/legal-advocate.png',
   },
   {
     id: 'journalist',

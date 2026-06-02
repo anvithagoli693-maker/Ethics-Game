@@ -38,7 +38,9 @@ export default function GameSetup({ onStart }: Props) {
           <div className="role-list">
             {ROLES.slice(0, count).map((r) => (
               <div key={r.id} className="role-preview" style={{ borderColor: r.colorHex }}>
-                <span className="role-emoji">{r.emoji}</span>
+                {r.characterImage
+                  ? <img src={r.characterImage} alt={r.name} className="role-character-img" />
+                  : <span className="role-emoji">{r.emoji}</span>}
                 <div>
                   <div className="role-name">{r.name}</div>
                   <div className="role-ability">{r.specialAbility}</div>
