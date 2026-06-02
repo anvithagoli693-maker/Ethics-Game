@@ -3,7 +3,7 @@ import type { Role } from '../types/game';
 export const ROLES: Role[] = [
   {
     id: 'organizer',
-    name: 'Community Organizer',
+    name: 'Activist',
     homeNeighborhood: 'suburb',
     specialAbility: 'Draw 1 extra Community Card, but only when on the same tile as another player.',
     color: 'yellow',
@@ -12,7 +12,7 @@ export const ROLES: Role[] = [
   },
   {
     id: 'legal',
-    name: 'Legal Advocate',
+    name: 'Lawyer',
     homeNeighborhood: 'courthouse',
     specialAbility: 'Spend 2 Community Cards of different colors to remove a single surveillance device from any neighborhood.',
     color: 'blue',
@@ -22,7 +22,7 @@ export const ROLES: Role[] = [
   },
   {
     id: 'captain',
-    name: 'Neighborhood Captain',
+    name: 'Parent',
     homeNeighborhood: 'media',
     specialAbility: 'Discard 2 Community Cards to reverse overflow — lower the Surveillance Density Tracker by 1.',
     color: 'green',
