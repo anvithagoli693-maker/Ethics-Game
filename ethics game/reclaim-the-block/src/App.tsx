@@ -525,8 +525,8 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
           selectedSlot={selectedSlot} dispatch={dispatch} onClearSelection={clearSelection} />
       )}
 
-      {/* ── Surveillance incident overlay ────────────────────── */}
-      {state.pendingIncident && (
+      {/* ── Surveillance incident overlay — shown after drawn cards are confirmed ── */}
+      {state.pendingIncident && !state.pendingDrawnCards && (
         <IncidentOverlay
           incident={state.pendingIncident}
           player={state.players[state.currentPlayerIndex]}
