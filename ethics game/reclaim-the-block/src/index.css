@@ -1309,34 +1309,69 @@ input, select { font-family: inherit; }
   animation: incident-flash 1.6s ease-out forwards;
   pointer-events: none;
 }
-.incident-modal {
+/* ── Incident card — playing-card layout ─────────────────── */
+.incident-card {
   position: relative; z-index: 1;
-  background: var(--surface);
+  width: min(300px, 88vw);
+  background: #1a0a04;
   border: 3px solid #ef4444;
-  box-shadow: 0 0 40px rgba(239,68,68,0.6), 6px 6px 0 var(--px-dark);
-  padding: 2rem;
-  max-width: 420px; width: 90%;
-  display: flex; flex-direction: column; gap: 0.85rem;
+  box-shadow: 0 0 40px rgba(239,68,68,0.55), 6px 6px 0 var(--px-dark);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  display: flex; flex-direction: column;
   animation: incident-card-in 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+  filter: drop-shadow(6px 6px 0 var(--px-dark));
 }
-.incident-modal-title {
-  font-size: 1.1rem; font-weight: 700; color: var(--red);
-  text-align: center; letter-spacing: 0.5px;
+/* Red header band */
+.incident-card-header {
+  background: #ef4444;
+  padding: 0.45rem 0.75rem;
+  display: flex; align-items: center; justify-content: center;
 }
-.incident-modal-effect {
-  font-size: 0.85rem; color: var(--text); line-height: 1.5;
+.incident-card-type-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem; color: #fff;
+  letter-spacing: 1px; text-align: center;
 }
-.incident-modal-edu {
-  font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;
-  border-top: 1px solid var(--border); padding-top: 0.5rem;
+/* Art zone */
+.incident-card-art {
+  background: #2a0c0c;
+  border-top: 2px solid #7f1d1d;
+  border-bottom: 2px solid #7f1d1d;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.1rem 0;
 }
-.incident-modal-label {
-  font-size: 0.8rem; font-weight: 700; color: var(--text);
+.incident-card-art-icon { font-size: 3rem; line-height: 1; }
+/* Inner rule body */
+.incident-card-body {
+  padding: 0.85rem 1rem 0.6rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  border-bottom: 1px solid #7f1d1d;
 }
-.incident-modal-options {
-  display: flex; flex-direction: column; gap: 0.4rem;
+.incident-card-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.52rem; color: #ef4444;
+  text-align: center; letter-spacing: 0.5px; line-height: 1.5;
 }
-.incident-modal-btn { width: 100%; margin-top: 0.25rem; }
+.incident-card-rule {
+  font-size: 0.78rem; color: #f5d0d0; line-height: 1.55; text-align: center;
+}
+/* Flavor text */
+.incident-card-flavor {
+  padding: 0.55rem 1rem;
+  font-size: 0.68rem; color: #a87070; line-height: 1.5;
+  font-style: italic; text-align: center;
+  border-bottom: 1px solid #3a1010;
+}
+/* Footer actions */
+.incident-card-footer {
+  padding: 0.75rem 1rem 0.85rem;
+  display: flex; flex-direction: column; gap: 0.45rem;
+}
+.incident-card-discard-label {
+  font-size: 0.72rem; font-weight: 700; color: #f5d0d0; text-align: center;
+}
+.incident-card-discard-options { display: flex; flex-direction: column; gap: 0.35rem; }
+.incident-card-btn { width: 100%; }
 
 /* ── Drawn Cards Overlay ─────────────────────────────────── */
 .drawn-cards-overlay {

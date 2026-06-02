@@ -108,28 +108,47 @@ function IncidentOverlay({
   return (
     <div className="incident-overlay">
       <div className="incident-flash" />
-      <div className="incident-modal">
-        <div className="incident-modal-title">⚠️ {incident.card.name}</div>
-        <div className="incident-modal-effect">{incident.card.effect}</div>
-        <div className="incident-modal-edu">{incident.card.educationalNote}</div>
-        {incident.card.effectType === 'neighbor-reports-neighbor' && player.hand.length > 0 ? (
-          <>
-            <div className="incident-modal-label">Discard a card:</div>
-            <div className="incident-modal-options">
-              {player.hand.map((card) => (
-                <button key={card.id} className="btn btn-discard-choice"
-                  onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse', discardCardId: card.id })}>
-                  <span className={`card-dot cat-${card.category}`} />{card.name}
-                </button>
-              ))}
-            </div>
-          </>
-        ) : (
-          <button className="btn btn-danger incident-modal-btn"
-            onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse' })}>
-            Acknowledge
-          </button>
-        )}
+      <div className="incident-card">
+        {/* Card header band */}
+        <div className="incident-card-header">
+          <span className="incident-card-type-label">⚠ SURVEILLANCE INCIDENT</span>
+        </div>
+
+        {/* Art zone */}
+        <div className="incident-card-art">
+          <span className="incident-card-art-icon">📡</span>
+        </div>
+
+        {/* Inner frame body */}
+        <div className="incident-card-body">
+          <div className="incident-card-name">{incident.card.name}</div>
+          <div className="incident-card-rule">{incident.card.effect}</div>
+        </div>
+
+        {/* Flavor / educational text */}
+        <div className="incident-card-flavor">{incident.card.educationalNote}</div>
+
+        {/* Action footer */}
+        <div className="incident-card-footer">
+          {incident.card.effectType === 'neighbor-reports-neighbor' && player.hand.length > 0 ? (
+            <>
+              <div className="incident-card-discard-label">Discard a card to resolve:</div>
+              <div className="incident-card-discard-options">
+                {player.hand.map((card) => (
+                  <button key={card.id} className="btn btn-discard-choice"
+                    onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse', discardCardId: card.id })}>
+                    <span className={`card-dot cat-${card.category}`} />{card.name}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <button className="btn btn-danger incident-card-btn"
+              onClick={() => dispatch({ type: 'INCIDENT_VOTE', choice: 'refuse' })}>
+              Acknowledge
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
