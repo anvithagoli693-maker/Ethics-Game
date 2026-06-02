@@ -1371,7 +1371,7 @@ input, select { font-family: inherit; }
     "corner-bl  board-zone  corner-br";
   background-image: url('/grass-bg.png');
   background-size: auto;
-  background-repeat: repeat;
+  background-repeat: round;
   image-rendering: pixelated;
 }
 
