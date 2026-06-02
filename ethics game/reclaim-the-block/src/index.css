@@ -301,8 +301,21 @@ input, select { font-family: inherit; }
 .density-v-num { font-size: 0.6rem; }
 
 /* In-place density tracker — compact badge that unfolds a panel within the cell */
+@keyframes dt-increase-pulse {
+  0%   { transform: scale(1);    box-shadow: none; }
+  15%  { transform: scale(1.18); box-shadow: 0 0 0 4px rgba(249,115,22,0.55), 0 0 20px rgba(249,115,22,0.45); }
+  40%  { transform: scale(1.12); box-shadow: 0 0 0 3px rgba(249,115,22,0.35); }
+  65%  { transform: scale(1.16); box-shadow: 0 0 0 4px rgba(249,115,22,0.5), 0 0 16px rgba(249,115,22,0.35); }
+  85%  { transform: scale(1.08); box-shadow: 0 0 0 2px rgba(249,115,22,0.2); }
+  100% { transform: scale(1);    box-shadow: none; }
+}
 .density-inline {
   display: flex; flex-direction: row; align-items: center; gap: 0.5rem;
+  transform-origin: right center;
+}
+.density-inline.dt-increasing,
+.density-tracker.dt-increasing {
+  animation: dt-increase-pulse 2.2s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 .density-inline-badge {
   display: flex; align-items: center; gap: 6px;

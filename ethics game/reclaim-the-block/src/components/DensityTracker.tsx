@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Props {
   value: number;
@@ -10,11 +10,28 @@ const DEVICE_EMOJIS = ['📷', '📷', '🔊', '🔊', '🚦', '🚦', '🚗', '
 
 export default function DensityTracker({ value, vertical }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [increasing, setIncreasing] = useState(false);
+  const prevValue = useRef(value);
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (value > prevValue.current) {
+      setIncreasing(true);
+      setExpanded(true);
+      if (collapseTimer.current) clearTimeout(collapseTimer.current);
+      collapseTimer.current = setTimeout(() => {
+        setIncreasing(false);
+        setExpanded(false);
+      }, 2200);
+    }
+    prevValue.current = value;
+  }, [value]);
+
   const idx = Math.min(Math.max(value - 1, 0), DEVICE_EMOJIS.length - 1);
 
   if (vertical) {
     return (
-      <div className={`density-inline ${expanded ? 'expanded' : ''}`}>
+      <div className={`density-inline ${expanded ? 'expanded' : ''} ${increasing ? 'dt-increasing' : ''}`}>
         {/* Compact badge — always shows current level; tap to toggle the in-place panel */}
         <button
           className="density-inline-badge"
@@ -46,7 +63,7 @@ export default function DensityTracker({ value, vertical }: Props) {
   }
 
   return (
-    <div className="density-tracker">
+    <div className={`density-tracker ${increasing ? 'dt-increasing' : ''}`}>
       <div className="density-header">
         <span className="density-title">Surveillance Density Tracker</span>
         <span className="density-value">Level {value}</span>
