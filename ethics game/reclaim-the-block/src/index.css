@@ -70,7 +70,6 @@ input, select { font-family: inherit; }
   font-size: clamp(0.65rem, 1.4vmin, 1rem);
   color: var(--yellow);
   margin: clamp(0.3rem, 0.7vh, 0.6rem) 0 clamp(0.2rem, 0.5vh, 0.4rem);
-  text-shadow: 3px 3px 0 var(--px-dark);
   line-height: 1.4;
 }
 .setup-subtitle { color: var(--text-muted); font-size: clamp(0.7rem, 1.2vmin, 0.88rem); }
