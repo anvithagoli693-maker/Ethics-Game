@@ -148,20 +148,24 @@ export default function ActionPanel({
     const finalRoll = Math.floor(Math.random() * 6) + 1;
     setRolling(true);
     setLanded(false);
-    let step = 0;
     const totalSteps = 14;
-    rollTimer.current = setInterval(() => {
-      step++;
-      setRollingFace(Math.floor(Math.random() * 6) + 1);
-      if (step >= totalSteps) {
-        clearInterval(rollTimer.current!);
-        setRollingFace(finalRoll);
-        setRolling(false);
-        setLanded(true);
-        // Short pause so the landing bounce plays before the action tracker appears
-        setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), 450);
-      }
-    }, 80);
+    // Ease-out: interval starts at 50ms and grows to ~220ms over totalSteps
+    function scheduleStep(step: number) {
+      const t = step / totalSteps; // 0 → 1
+      const delay = 50 + t * t * 170; // quadratic ease-out: 50ms → 220ms
+      rollTimer.current = setTimeout(() => {
+        if (step >= totalSteps) {
+          setRollingFace(finalRoll);
+          setRolling(false);
+          setLanded(true);
+          setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), 450);
+        } else {
+          setRollingFace(Math.floor(Math.random() * 6) + 1);
+          scheduleStep(step + 1);
+        }
+      }, delay);
+    }
+    scheduleStep(0);
   }
 
   // ── Hold-for-tooltip state ───────────────────────────────────────────────
