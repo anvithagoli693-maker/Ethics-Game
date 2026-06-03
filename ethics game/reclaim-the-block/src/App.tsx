@@ -374,9 +374,10 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
             <button className="btn-quit" onClick={onRestart}>← New Game</button>
           </div>
         </div>
-        {/* Shared trackers — attached to the round-info header (same state as bottom set) */}
+        {/* Surveillance (density) tracker, rotated 180° (see .board-trackers-header)
+           so the Activist & Parent players at the top of the table can read it.
+           The privacy meter now lives in the top bar and is no longer duplicated here. */}
         <div className="board-trackers board-trackers-header">
-          <PrivacyMeter value={state.privacyMeter} vertical blocked={!!state.pendingIncident} />
           <DensityTracker value={state.densityTracker} vertical blocked={!!state.pendingIncident} />
         </div>
         <RevealedCards cards={state.revealedSurveillanceCards} />
@@ -535,9 +536,9 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
           </div>
         </div>
 
-        {/* Shared trackers — bottom edge (duplicate of top set, same state) */}
+        {/* Surveillance (density) tracker for the bottom-side players. The privacy
+           meter now lives in the top bar and is no longer duplicated here. */}
         <div className="board-trackers board-trackers-bottom">
-          <PrivacyMeter value={state.privacyMeter} vertical blocked={!!state.pendingIncident} />
           <DensityTracker value={state.densityTracker} vertical blocked={!!state.pendingIncident} />
         </div>
       </div>
