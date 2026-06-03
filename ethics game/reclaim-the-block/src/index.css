@@ -1770,6 +1770,21 @@ input, select { font-family: inherit; }
 .tv-game .board-roads-bottom {
   height: 44px;
 }
+/* ── Connect the inter-district roads to each neighbourhood ──────────────
+   Purely cosmetic nudges (margins + transform). The movement graph, the
+   waypoint click targets and the road IDs are all unchanged. */
+/* Vertical roads: pull the top/bottom districts inward so the road meets the
+   facing house. */
+.tv-game .board-roads-top { margin-top: -22px; }
+.tv-game .board-roads-bottom { margin-bottom: -22px; }
+/* Horizontal roads: pull the side districts inward and drop the road to the
+   height of the N2/N3 side houses so it lines up with them. */
+.tv-game .city-hall-area { margin-left: -16px; margin-right: -16px; }
+.tv-game .city-hall-row .road-segment-h { transform: translateY(15px); }
+/* Politics Row sits at the bottom, so its name banner faces the town square and
+   blocks the road. Flip its column order to move the banner to the outer edge,
+   leaving the N1 house facing the road. */
+.tv-game .board-n4 .neighborhood-tile { flex-direction: column-reverse; }
 .tv-game .city-hall {
   width: 142px; height: 158px; min-width: 142px;
   padding: 0;
