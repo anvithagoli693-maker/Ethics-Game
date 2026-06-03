@@ -454,7 +454,7 @@ input, select { font-family: inherit; }
   width: 54px; height: 54px;
   background: #d4b880;
   border: 2px solid var(--px-dark);
-  border-radius: 2px;
+  border-radius: 50%;
   box-shadow: 2px 2px 0 var(--px-dark);
   font-size: 1.4rem;
   z-index: 1;
@@ -645,7 +645,7 @@ input, select { font-family: inherit; }
 .int-road-seg.seg-h, .int-road-seg.seg-v { display: flex; align-items: center; justify-content: center; }
 .int-waypoint {
   width: 18px; height: 18px; flex-shrink: 0; position: relative; z-index: 1;
-  border-radius: 2px;
+  border-radius: 50%;
   background: #d4b880; border: 2px solid var(--px-dark); box-shadow: 2px 2px 0 var(--px-dark);
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 0.6rem;
 }
