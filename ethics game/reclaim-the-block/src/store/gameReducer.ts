@@ -385,13 +385,7 @@ function placeDevice(
   const deviceShift = meterShiftForDevice(device);
   s = shiftMeter(s, deviceShift, `${deviceEmoji(device)} placed in ${n.name}`);
 
-  // Density threshold shifts
-  if (densityTrack === 2) {
-    s = shiftMeter(s, -1, '2 slots filled in ' + n.name);
-  } else if (densityTrack === 3) {
-    s = shiftMeter(s, -2, '3 slots filled in ' + n.name);
-  } else if (densityTrack === 4) {
-    s = shiftMeter(s, -3, `Neighborhood full (${n.name})`);
+  if (densityTrack === 4) {
     s = { ...s, densityTracker: Math.min(8, s.densityTracker + 1) };
     s = log(s, `Density Tracker increased to ${s.densityTracker}`);
     // Draw incident card

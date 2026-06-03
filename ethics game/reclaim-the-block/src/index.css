@@ -387,17 +387,27 @@ input, select { font-family: inherit; }
 .density-inline-name { font-size: 0.5rem; line-height: 1.1; }
 .density-inline-lv { font-weight: 700; font-size: 0.55rem; }
 
-/* Horizontal meter (fallback / unused in current layout) */
+/* Horizontal segmented privacy meter */
 .privacy-meter { flex: 2; min-width: 280px; }
 .meter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .meter-title { font-weight: 700; font-size: 0.85rem; }
 .meter-value { font-weight: 700; font-size: 1rem; }
-.meter-track { height: 16px; background: var(--surface2); border: 2px solid var(--border); overflow: hidden; position: relative; }
-.meter-fill { height: 100%; transition: width 0.4s ease, background 0.4s ease; }
-.meter-marker { position: absolute; top: 0; height: 100%; width: 2px; background: rgba(255,255,255,0.5); }
+.pm-h-segments {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: 3px;
+  box-sizing: border-box;
+}
+.pm-h-seg {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 22px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
 .meter-labels { display: flex; justify-content: space-between; margin-top: 3px; }
-.meter-label-lose { color: var(--red); font-size: 0.7rem; font-weight: 700; }
-.meter-label-safe { color: var(--green); font-size: 0.7rem; font-weight: 700; }
+.meter-label-tick { color: var(--text-muted); font-size: 0.65rem; font-weight: 700; }
 .meter-warning { color: var(--red); font-size: 0.75rem; font-weight: 700; margin-top: 4px; animation: pulse 1s infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
@@ -1700,7 +1710,7 @@ input, select { font-family: inherit; }
   gap: 1rem;
   flex-shrink: 0;
   background: var(--surface);
-  border: 3px solid var(--px-dark);
+  border: 3px solid var(--border);
   box-shadow: 0 4px 0 var(--px-dark), 4px 4px 0 var(--px-dark);
   pointer-events: all;    /* restore interactivity for the bar itself */
 }

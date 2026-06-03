@@ -38,9 +38,8 @@ export default function PrivacyMeter({ value, vertical, blocked }: Props) {
     }
   }, [blocked]);
 
-  const pct = (value / 30) * 100;
-  const color = value <= 5 ? '#ef4444' : value <= 10 ? '#f97316' : value <= 15 ? '#eab308' : '#22c55e';
   const dot = value <= 5 ? '🔴' : value <= 10 ? '🟠' : value <= 15 ? '🟡' : '🟢';
+  const fillColor = value <= 5 ? 'var(--red)' : value <= 15 ? 'var(--yellow)' : 'var(--green)';
 
   const critical = value <= 5;
 
@@ -72,19 +71,29 @@ export default function PrivacyMeter({ value, vertical, blocked }: Props) {
 
   return (
     <div className={`privacy-meter ${decreasing ? 'pm-decreasing' : ''}`}>
-      <div className={`meter-header${critical && !blocked ? ' pm-critical-active' : ''}`}>
+      <div className="meter-header">
         <span className="meter-title">Privacy &amp; Community Trust</span>
-        <span className="meter-value" style={{ color }}>
-          {value} / 30
-        </span>
       </div>
-      <div className="meter-track">
-        <div className="meter-fill" style={{ width: `${pct}%`, background: color }} />
-        <div className="meter-marker start" style={{ left: `${pct}%` }} title={`Current (${value})`} />
+      <div className="pm-h-segments">
+        {Array.from({ length: 30 }, (_, i) => {
+          const filled = i + 1 <= value;
+          return (
+            <div
+              key={i}
+              className="pm-h-seg"
+              style={filled ? { background: fillColor, borderColor: fillColor } : {}}
+            />
+          );
+        })}
       </div>
       <div className="meter-labels">
-        <span className="meter-label-lose">0 LOSE</span>
-        <span className="meter-label-safe">30 SAFE</span>
+        {[0, 5, 10, 15, 20, 25, 30].map(n => (
+          <span key={n} className="meter-label-tick" style={
+            n === 0 ? { color: 'var(--red)' } :
+            n === 15 ? { color: 'var(--yellow)' } :
+            n === 30 ? { color: 'var(--green)' } : {}
+          }>{n}</span>
+        ))}
       </div>
     </div>
   );
