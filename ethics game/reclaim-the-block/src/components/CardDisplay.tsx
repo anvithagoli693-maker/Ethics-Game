@@ -46,7 +46,6 @@ export default function CardDisplay({ card, isSelected, onClick, disabled }: Pro
       {/* Header band */}
       <div className="card-top" style={{ background: color }}>
         <span className="card-category">{CATEGORY_LABELS[card.category]}</span>
-        {card.isPowerUp && <span className="powerup-star">⭐</span>}
       </div>
       {/* Body */}
       <div className="card-name">{card.name}</div>
@@ -65,8 +64,7 @@ export default function CardDisplay({ card, isSelected, onClick, disabled }: Pro
               {/* Header band */}
               <div className="card-modal-top" style={{ background: color }}>
                 <span className="card-modal-category">{CATEGORY_LABELS[card.category]}</span>
-                {card.isPowerUp && <span className="powerup-star">⭐</span>}
-                <button className="card-modal-close" onClick={() => setShowModal(false)} title="Close">✕</button>
+                        <button className="card-modal-close" onClick={() => setShowModal(false)} title="Close">✕</button>
               </div>
               {/* Art zone */}
               <div className="card-modal-art">

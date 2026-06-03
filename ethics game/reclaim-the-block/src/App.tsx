@@ -646,7 +646,6 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
                 <div className={`drawn-card`}>
                   <div className="drawn-card-header" style={{ background: DRAWN_CARD_COLORS[card.category] }}>
                     <span className="drawn-card-category">{DRAWN_CARD_LABELS[card.category]}</span>
-                    {card.isPowerUp && <span className="drawn-card-star">⭐</span>}
                   </div>
                   <div className="drawn-card-art">
                     <span className="drawn-card-art-icon">{DRAWN_CARD_ICONS[card.category]}</span>
