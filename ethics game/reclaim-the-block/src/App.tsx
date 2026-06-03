@@ -374,9 +374,9 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
             <button className="btn-quit" onClick={onRestart}>← New Game</button>
           </div>
         </div>
-        {/* Surveillance (density) tracker, rotated 180° (see .board-trackers-header)
-           so the Activist & Parent players at the top of the table can read it.
-           The privacy meter now lives in the top bar and is no longer duplicated here. */}
+        {/* Surveillance (density) tracker, shown upright under the top bar so the
+           Activist & Parent players can read it. The privacy meter now lives in
+           the top bar and is no longer duplicated here. */}
         <div className="board-trackers board-trackers-header">
           <DensityTracker value={state.densityTracker} vertical blocked={!!state.pendingIncident} />
         </div>

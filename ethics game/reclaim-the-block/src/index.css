@@ -1625,9 +1625,9 @@ input, select { font-family: inherit; }
   z-index: 50;
   display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
 }
-/* Header copy: attached under the round-info bar (top-center has pointer-events:none),
-   flipped 180° so the players on that side can read it */
-.board-trackers-header { pointer-events: auto; padding: 0.4rem 0; transform: rotate(180deg); }
+/* Header copy: surveillance tracker shown upright under the top bar so it reads
+   the same way up as the Privacy meter above it (top-center has pointer-events:none). */
+.board-trackers-header { pointer-events: auto; padding: 0.4rem 0; }
 
 /* Scale board elements down so the board fits the middle row.
    Rule of thumb: 23vh rows leave ~54vh for the board at 1080p ≈ 583px.
