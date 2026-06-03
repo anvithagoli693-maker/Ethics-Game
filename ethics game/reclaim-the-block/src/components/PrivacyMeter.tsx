@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function PrivacyMeter({ value, vertical, blocked }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [decreasing, setDecreasing] = useState(false);
   const prevValue = useRef(value);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -15,11 +15,9 @@ export default function PrivacyMeter({ value, vertical, blocked }: Props) {
 
   function triggerAnim() {
     setDecreasing(true);
-    setExpanded(true);
     if (collapseTimer.current) clearTimeout(collapseTimer.current);
     collapseTimer.current = setTimeout(() => {
       setDecreasing(false);
-      setExpanded(false);
     }, 2200);
   }
 
