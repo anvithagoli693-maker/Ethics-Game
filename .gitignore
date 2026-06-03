@@ -1,1 +1,4 @@
 .claude/settings.local.json
+
+# Local reference images (not part of the game)
+pixil-frame-*.png
