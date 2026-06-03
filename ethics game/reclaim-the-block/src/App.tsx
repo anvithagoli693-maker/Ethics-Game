@@ -278,10 +278,15 @@ function GameScreen({ playerCount, onRestart }: GameScreenProps) {
   }, []);
 
   const handleCardClick = useCallback((card: CommunityCard) => {
-    setSelectedCardIds((prev) =>
-      prev.includes(card.id) ? prev.filter((id) => id !== card.id) : [...prev, card.id]
-    );
-  }, []);
+    setSelectedCardIds((prev) => {
+      const isSelected = prev.includes(card.id);
+      if (isSelected) return prev.filter((id) => id !== card.id);
+      // Cap selection at discard count when a discard is pending
+      const discardCount = state.pendingDiscard?.count;
+      if (discardCount !== undefined && prev.length >= discardCount) return prev;
+      return [...prev, card.id];
+    });
+  }, [state.pendingDiscard]);
 
   const handleNeighborhoodSelect = useCallback((id: NeighborhoodId) => {
     setSelectedNeighborhood((prev) => (prev === id ? null : id));
