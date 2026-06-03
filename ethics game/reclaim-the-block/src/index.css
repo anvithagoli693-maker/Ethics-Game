@@ -284,14 +284,15 @@ input, select { font-family: inherit; }
   white-space: nowrap;
 }
 .pm-segments {
-  display: flex; gap: 2px; flex-wrap: nowrap;
+  display: flex; gap: 3px; flex-wrap: nowrap;
+  background: var(--px-dark); padding: 3px; border: 2px solid var(--px-dark);
 }
 .pm-seg {
-  width: 10px; height: 22px; flex-shrink: 0;
-  background: var(--surface2); border: 1px solid var(--border);
-  transition: background 0.2s, border-color 0.2s;
+  width: 9px; height: 20px; flex-shrink: 0;
+  background: rgba(255,255,255,0.12);
+  transition: background 0.2s;
 }
-.pm-seg-filled { border-color: transparent; }
+.pm-seg-filled { }
 .pm-seg-labels {
   display: flex; justify-content: space-between; width: 100%;
   font-size: 0.48rem; font-weight: 700; padding: 1px 0;
