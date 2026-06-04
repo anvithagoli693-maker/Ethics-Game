@@ -69,6 +69,51 @@ const SIDE_FACES: Record<number, { top: number; right: number }> = {
   6: { top: 3, right: 5 },
 };
 
+// ── 3D Cube die ──────────────────────────────────────────────────────────────
+// Dot positions derived from the 44×44 interior of the 48px face (2px border each side).
+// Absolute children offset from the inner-border edge (the 44px padding box).
+// Centers at 44*1/4=11, 44*1/2=22, 44*3/4=33 → left/top = center - 4 → 7, 18, 29
+type DotXY = [number, number];
+const CUBE_DOTS: Record<number, DotXY[]> = {
+  1: [[18, 18]],
+  2: [[7,  7],  [29, 29]],
+  3: [[7,  7],  [18, 18], [29, 29]],
+  4: [[7,  7],  [29, 7],  [7,  29], [29, 29]],
+  5: [[7,  7],  [29, 7],  [18, 18], [7,  29], [29, 29]],
+  6: [[7,  7],  [29, 7],  [7,  18], [29, 18], [7,  29], [29, 29]],
+};
+// Face number → CSS transform to position it on the cube (half-size = 24px)
+const CUBE_FACES: [number, string][] = [
+  [1, 'translateZ(24px)'],
+  [6, 'rotateY(180deg) translateZ(24px)'],
+  [3, 'rotateY(90deg) translateZ(24px)'],
+  [4, 'rotateY(-90deg) translateZ(24px)'],
+  [2, 'rotateX(-90deg) translateZ(24px)'],
+  [5, 'rotateX(90deg) translateZ(24px)'],
+];
+// Target cube rotation so each face faces the camera
+const FACE_LANDING: Record<number, { rx: number; ry: number }> = {
+  1: { rx: 0,   ry: 0   },
+  2: { rx: -90, ry: 0   },
+  3: { rx: 0,   ry: -90 },
+  4: { rx: 0,   ry: 90  },
+  5: { rx: 90,  ry: 0   },
+  6: { rx: 0,   ry: 180 },
+};
+function DieCube() {
+  return (
+    <div className="die3d-cube">
+      {CUBE_FACES.map(([faceNum, faceTransform]) => (
+        <div key={faceNum} className="die3d-face" style={{ transform: faceTransform }}>
+          {(CUBE_DOTS[faceNum] ?? []).map(([x, y], i) => (
+            <div key={i} className="die3d-dot" style={{ left: x, top: y }} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PixelDie({ face }: { face: number }) {
   const frontDots = FACE_DOTS[face] ?? FACE_DOTS[1];
   const { top: topFace, right: rightFace } = SIDE_FACES[face] ?? { top: 2, right: 3 };
@@ -121,10 +166,11 @@ function PixelDie({ face }: { face: number }) {
   );
 }
 
-// Sparkle directions: 8 points of the compass, ~44px radius
+// Pixel sparkle directions: 10 particles, ~55px radius
 const SPARKLE_DIRS = [
-  { tx: 0, ty: -44 }, { tx: 31, ty: -31 }, { tx: 44, ty: 0 }, { tx: 31, ty: 31 },
-  { tx: 0, ty: 44 },  { tx: -31, ty: 31 }, { tx: -44, ty: 0 }, { tx: -31, ty: -31 },
+  { tx: 0,   ty: -56 }, { tx: 40,  ty: -40 }, { tx: 56,  ty: 0  }, { tx: 40,  ty: 40 },
+  { tx: 0,   ty: 56  }, { tx: -40, ty: 40  }, { tx: -56, ty: 0  }, { tx: -40, ty: -40 },
+  { tx: 28,  ty: -50 }, { tx: -28, ty: -50 },
 ];
 
 export default function ActionPanel({
@@ -143,37 +189,60 @@ export default function ActionPanel({
   const [landed, setLanded] = useState(false);
   const [rollingFace, setRollingFace] = useState(6);
   const [dicePos, setDicePos] = useState({ x: 0, y: 0 });
+  const [diceRot, setDiceRot] = useState({ rx: 0, ry: 0, rz: 0 });
+  const [diceScale, setDiceScale] = useState(1);
   const [diceTransition, setDiceTransition] = useState('none');
   const rollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rotAccum = useRef({ rx: 0, ry: 0, rz: 0 });
 
   function handleDiceTap() {
     if (rolling || landed) return;
     const finalRoll = Math.floor(Math.random() * 6) + 1;
     setRolling(true);
     setLanded(false);
+    rotAccum.current = { rx: 0, ry: 0, rz: 0 };
     const totalSteps = 14;
     function scheduleStep(step: number) {
-      const t = step / totalSteps; // 0 → 1
-      const delay = 40 + t * t * t * 320; // cubic ease-out: 40ms → 360ms
+      const t = step / totalSteps;
+      const delay = 40 + t * t * t * 320;
       rollTimer.current = setTimeout(() => {
         if (step >= totalSteps) {
+          // Rotate to nearest face-forward position for the rolled face
+          const target = FACE_LANDING[finalRoll];
+          const nearest = (acc: number, t: number) => Math.round((acc - t) / 360) * 360 + t;
+          const finalRot = {
+            rx: nearest(rotAccum.current.rx, target.rx),
+            ry: nearest(rotAccum.current.ry, target.ry),
+            rz: Math.round(rotAccum.current.rz / 360) * 360,
+          };
           setRollingFace(finalRoll);
           setRolling(false);
           setLanded(true);
-          // Slide back to center
-          setDiceTransition(`transform ${delay * 0.8}ms ease-out`);
+          const landMs = 480;
+          setDiceTransition(`transform ${landMs}ms cubic-bezier(0.22, 0.61, 0.36, 1)`);
           setDicePos({ x: 0, y: 0 });
+          setDiceRot(finalRot);
+          setDiceScale(1);
           navigator.vibrate?.([60, 30, 60]);
-          setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), 450);
+          setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), landMs + 100);
         } else {
-          // Random position within ±65px x, ±45px y; slows down as t→1
+          // Tumble: large rotation early, slows as t→1
+          const spin = (1 - t * 0.65) * 140;
+          rotAccum.current = {
+            rx: rotAccum.current.rx + (Math.random() * 2 - 1) * spin,
+            ry: rotAccum.current.ry + (Math.random() * 2 - 1) * spin,
+            rz: rotAccum.current.rz + (Math.random() * 2 - 1) * spin * 0.4,
+          };
           const range = 1 - t * 0.5;
-          const x = (Math.random() * 2 - 1) * 65 * range;
-          const y = (Math.random() * 2 - 1) * 45 * range;
+          const x = (Math.random() * 2 - 1) * 52 * range;
+          const y = (Math.random() * 2 - 1) * 38 * range;
+          const scale = 1.15 - t * 0.15;
           setDiceTransition(`transform ${delay * 0.7}ms ease-in-out`);
           setDicePos({ x, y });
+          setDiceRot({ ...rotAccum.current });
+          setDiceScale(scale);
           setRollingFace(Math.floor(Math.random() * 6) + 1);
-          const buzzLen = Math.round(8 + t * t * t * 80); // cubic ease: 8ms → 88ms
+          const buzzLen = Math.round(8 + t * t * t * 80);
           navigator.vibrate?.(buzzLen);
           scheduleStep(step + 1);
         }
@@ -445,14 +514,19 @@ export default function ActionPanel({
           <div className="ap-dice-prompt">
             {rolling ? 'Rolling…' : landed ? `Rolled ${rollingFace}!` : 'Tap to roll!'}
           </div>
-          <div
-            className={`ap-die-wrap${rolling ? ' jitter' : landed ? ' land' : ''}`}
-            onClick={handleDiceTap}
-            role="button"
-            aria-label="Roll dice"
-            style={{ transform: `translate(${dicePos.x}px, ${dicePos.y}px)`, transition: diceTransition }}
-          >
-            <PixelDie face={rollingFace} />
+          <div className="ap-dice-perspective">
+            <div
+              className={`ap-die-wrap${rolling ? ' jitter' : landed ? ' land' : ''}`}
+              onClick={handleDiceTap}
+              role="button"
+              aria-label="Roll dice"
+              style={{
+                transform: `translate(${dicePos.x}px, ${dicePos.y}px) rotateX(${diceRot.rx}deg) rotateY(${diceRot.ry}deg) rotateZ(${diceRot.rz}deg) scale(${diceScale})`,
+                transition: diceTransition,
+              }}
+            >
+              <DieCube />
+            </div>
             {landed && SPARKLE_DIRS.map((dir, i) => (
               <span
                 key={i}
@@ -545,8 +619,8 @@ export default function ActionPanel({
                 onPointerCancel={endHold}
                 onClick={() => { if (!tooltipShown.current) { dispatch({ type: 'END_TURN' }); onClearSelection(); } }}
               >
-                ✅ End Turn
-                <span className="ap-end-sub">draw 2 cards</span>
+                End Turn
+                <span className="ap-end-sub">DRAW 2 CARDS</span>
               </button>
             </>
           )}

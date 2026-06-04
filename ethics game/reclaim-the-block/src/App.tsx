@@ -68,7 +68,6 @@ function CornerPanel({
           <span className="corner-pos">📍 {POSITION_SHORT[player.position] ?? player.position}</span>
         </div>
         <span className="corner-hand-count">{player.hand.length}/7</span>
-        {isActive && <span className="corner-active-badge">⚡ ACTIVE</span>}
       </div>
       <div className="corner-hand">
         {n === 0 ? (
