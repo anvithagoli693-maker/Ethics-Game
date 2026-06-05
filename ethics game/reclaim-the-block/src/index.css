@@ -100,12 +100,13 @@ input, select { font-family: inherit; }
 .count-btn:hover { border-color: var(--yellow); color: var(--yellow); transform: translate(-1px,-1px); box-shadow: inset 2px 2px 0 var(--px-highlight), inset -2px -2px 0 var(--px-shadow), 4px 4px 0 var(--px-dark); }
 .count-btn.selected { background: var(--yellow); border-color: var(--px-dark); color: #fff; transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--px-dark); }
 
-.role-list { display: flex; flex-direction: column; gap: clamp(0.2rem, 0.5vh, 0.4rem); }
+.role-list { display: flex; flex-direction: row; gap: clamp(0.4rem, 0.8vh, 0.6rem); }
 .role-preview {
-  display: flex; align-items: center; gap: 0.6rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
   background: var(--surface2); border: 2px solid;
   box-shadow: inset 1px 1px 0 var(--px-highlight), inset -1px -1px 0 var(--px-shadow);
-  padding: clamp(0.25rem, 0.6vh, 0.5rem) 0.6rem;
+  padding: clamp(0.5rem, 1vh, 0.8rem) 0.6rem;
+  flex: 1 1 0; min-width: 0; text-align: center;
 }
 .role-emoji { font-size: clamp(1rem, 2vh, 1.3rem); flex-shrink: 0; }
 .role-character-img { width: clamp(80px, 11vh, 110px); height: clamp(80px, 11vh, 110px); object-fit: contain; flex-shrink: 0; image-rendering: pixelated; }
