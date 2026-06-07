@@ -12,6 +12,7 @@ import ActionPanel from './components/ActionPanel';
 import GameLog from './components/GameLog';
 import RevealedCards from './components/RevealedCards';
 import TutorialOverlay from './components/TutorialOverlay';
+import RoleOverlay from './components/RoleOverlay';
 
 const DRAWN_CARD_LABELS: Record<string, string> = {
   blue: 'Legal', yellow: 'Organizing', green: 'Media', red: 'Political', purple: 'Neighborhood',
@@ -225,6 +226,7 @@ function GameScreen({ playerCount, onRestart, onNewGame }: GameScreenProps) {
   const [showLog, setShowLog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showRoles, setShowRoles] = useState(false);
   // Intro story — shown once when a fresh game mounts, before Round 1.
   const [showIntro, setShowIntro] = useState(true);
 
@@ -379,7 +381,7 @@ function GameScreen({ playerCount, onRestart, onNewGame }: GameScreenProps) {
                   Game Log
                 </button>
                 <button className="btn-quit" onClick={onNewGame}>New Game</button>
-                <button className="btn-quit">Role</button>
+                <button className="btn-quit" onClick={() => { setShowRoles(true); setShowSettings(false); }}>Role</button>
                 <button className="btn-quit" onClick={() => { setShowTutorial(true); setShowSettings(false); }}>Tutorial</button>
                 <button className="btn-quit" onClick={onRestart}>Exit</button>
               </div>
@@ -584,7 +586,7 @@ function GameScreen({ playerCount, onRestart, onNewGame }: GameScreenProps) {
                     Game Log
                   </button>
                   <button className="btn-quit" onClick={onNewGame}>New Game</button>
-                <button className="btn-quit">Role</button>
+                <button className="btn-quit" onClick={() => { setShowRoles(true); setShowSettings(false); }}>Role</button>
                   <button className="btn-quit" onClick={() => { setShowTutorial(true); setShowSettings(false); }}>Tutorial</button>
                 <button className="btn-quit" onClick={onRestart}>Exit</button>
                 </div>
@@ -651,6 +653,9 @@ function GameScreen({ playerCount, onRestart, onNewGame }: GameScreenProps) {
 
       {/* ── In-game tutorial overlay ─────────────────────────────── */}
       {showTutorial && <TutorialOverlay onClose={() => setShowTutorial(false)} />}
+
+      {/* ── Role overview overlay ────────────────────────────────── */}
+      {showRoles && <RoleOverlay state={state} onClose={() => setShowRoles(false)} />}
 
       {/* ── Surveillance incident overlay — shown after drawn cards are confirmed ── */}
       {state.pendingIncident && !state.pendingDrawnCards && (
