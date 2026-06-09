@@ -42,6 +42,7 @@ export default function CardDisplay({ card, isSelected, onClick, disabled }: Pro
       className={`card ${isSelected ? 'card-selected' : ''} ${disabled ? 'card-disabled' : ''} ${card.isPowerUp ? 'card-powerup' : ''}`}
       style={{ borderColor: color }}
       onClick={!disabled ? onClick : undefined}
+      onDoubleClick={(e) => { e.stopPropagation(); setShowModal(true); }}
     >
       {/* Header band */}
       <div className="card-top" style={{ background: color }}>
@@ -57,14 +58,16 @@ export default function CardDisplay({ card, isSelected, onClick, disabled }: Pro
         createPortal(
           <div className="card-modal-overlay" onClick={() => setShowModal(false)}>
             <div
-              className="card-modal"
-              style={{ borderColor: color }}
+              className={`card-modal-border${card.isPowerUp ? ' card-modal-powerup-shine' : ''}`}
+              style={{ background: color, ['--card-color' as string]: color }}
               onClick={(e) => e.stopPropagation()}
+            >
+            <div
+              className="card-modal"
             >
               {/* Header band */}
               <div className="card-modal-top" style={{ background: color }}>
                 <span className="card-modal-category">{CATEGORY_LABELS[card.category]}</span>
-                        <button className="card-modal-close" onClick={() => setShowModal(false)} title="Close">✕</button>
               </div>
               {/* Art zone */}
               <div className="card-modal-art">
@@ -76,6 +79,8 @@ export default function CardDisplay({ card, isSelected, onClick, disabled }: Pro
                 <div className="card-modal-edu">{card.educationalContent}</div>
                 <div className="card-modal-effect">{card.effect}</div>
               </div>
+              <button className="card-modal-ok" onClick={() => setShowModal(false)}>OK</button>
+            </div>
             </div>
           </div>,
           document.body

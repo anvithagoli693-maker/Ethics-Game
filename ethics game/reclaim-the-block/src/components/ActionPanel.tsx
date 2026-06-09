@@ -94,10 +94,10 @@ const CUBE_FACES: [number, string][] = [
 // Target cube rotation so each face faces the camera
 const FACE_LANDING: Record<number, { rx: number; ry: number }> = {
   1: { rx: 0,   ry: 0   },
-  2: { rx: -90, ry: 0   },
+  2: { rx: 90,  ry: 0   },
   3: { rx: 0,   ry: -90 },
   4: { rx: 0,   ry: 90  },
-  5: { rx: 90,  ry: 0   },
+  5: { rx: -90, ry: 0   },
   6: { rx: 0,   ry: 180 },
 };
 function DieCube() {
@@ -218,13 +218,13 @@ export default function ActionPanel({
           setRollingFace(finalRoll);
           setRolling(false);
           setLanded(true);
-          const landMs = 480;
-          setDiceTransition(`transform ${landMs}ms cubic-bezier(0.22, 0.61, 0.36, 1)`);
+          const landMs = 150;
+          setDiceTransition(`transform ${landMs}ms ease-out`);
           setDicePos({ x: 0, y: 0 });
           setDiceRot(finalRot);
           setDiceScale(1);
           navigator.vibrate?.([60, 30, 60]);
-          setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), landMs + 100);
+          setTimeout(() => dispatch({ type: 'ROLL_DIE', precomputedRoll: finalRoll }), landMs + 80);
         } else {
           // Tumble: large rotation early, slows as t→1
           const spin = (1 - t * 0.65) * 140;
@@ -498,15 +498,6 @@ export default function ActionPanel({
         </div>
       )}
 
-      {/* ── Board phase ─────────────────────────────────────── */}
-      {phase === 'board-phase' && !pendingIncident && (
-        <div className="ap-phase-box">
-          <p>All players have taken their turns. Place the next surveillance device.</p>
-          <button className="btn btn-danger" onClick={() => dispatch({ type: 'BOARD_PHASE' })}>
-            Run Board Phase
-          </button>
-        </div>
-      )}
 
       {/* ── Dice roll ───────────────────────────────────────── */}
       {phase === 'player-turn' && state.pendingDiceRoll && !pendingIncident && (

@@ -1081,6 +1081,11 @@ input, select { font-family: inherit; }
   line-height: 1.5;
   color: var(--text-muted);
 }
+.ap-phase-box {
+  border-color: var(--red);
+  background: rgba(239,68,68,0.06);
+  box-shadow: inset 0 0 0 1px rgba(239,68,68,0.15);
+}
 
 .ap-dice-interactive {
   display: flex;
@@ -1416,39 +1421,65 @@ input, select { font-family: inherit; }
   display: flex; align-items: center; justify-content: center;
   padding: 2rem;
 }
+.card-modal-border {
+  clip-path: polygon(
+    0 10px, 4px 6px, 6px 4px, 10px 0,
+    calc(100% - 10px) 0, calc(100% - 6px) 4px, calc(100% - 4px) 6px, 100% 10px,
+    100% calc(100% - 10px), calc(100% - 4px) calc(100% - 6px), calc(100% - 6px) calc(100% - 4px), calc(100% - 10px) 100%,
+    10px 100%, 6px calc(100% - 4px), 4px calc(100% - 6px), 0 calc(100% - 10px)
+  );
+  padding: 3px;
+  filter: drop-shadow(6px 6px 0 var(--px-dark));
+}
+.card-modal-powerup-shine .card-modal { position: relative; overflow: hidden; }
+.card-modal-powerup-shine .card-modal::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+  width: 40%;
+  animation: card-shimmer 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
 .card-modal {
-  width: 320px; max-width: 90vw;
-  background: var(--surface);
-  border: 3px solid;
-  box-shadow: 6px 6px 0 var(--px-dark);
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  width: 240px; max-width: 80vw; min-height: 420px;
+  background: #f5f0e8;
+  box-shadow: inset 2px 2px 0 var(--px-highlight);
+  clip-path: polygon(
+    0 10px, 4px 6px, 6px 4px, 10px 0,
+    calc(100% - 10px) 0, calc(100% - 6px) 4px, calc(100% - 4px) 6px, 100% 10px,
+    100% calc(100% - 10px), calc(100% - 4px) calc(100% - 6px), calc(100% - 6px) calc(100% - 4px), calc(100% - 10px) 100%,
+    10px 100%, 6px calc(100% - 4px), 4px calc(100% - 6px), 0 calc(100% - 10px)
+  );
   font-family: 'Nunito', system-ui, sans-serif;
   display: flex; flex-direction: column;
-  filter: drop-shadow(6px 6px 0 var(--px-dark));
 }
 /* Header band */
 .card-modal-top {
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.55rem 0.75rem;
+  padding: 0.65rem 0.75rem;
+  display: flex; align-items: center; justify-content: center;
 }
 .card-modal-category {
-  flex: 1; font-weight: 700; font-size: 0.78rem;
-  text-transform: uppercase; letter-spacing: 0.5px; color: rgba(0,0,0,0.85);
+  font-family: 'Press Start 2P', monospace; font-size: 0.55rem;
+  text-transform: uppercase; letter-spacing: 1px; color: white; text-align: center; line-height: 1.6;
 }
-.card-modal-close {
-  background: rgba(0,0,0,0.2); border: 2px solid rgba(0,0,0,0.35);
-  color: #fff; font-weight: 700; font-size: 0.85rem;
-  width: 26px; height: 26px; cursor: pointer; line-height: 1;
-}
-.card-modal-close:hover { background: rgba(0,0,0,0.4); }
 /* Art zone */
-.card-modal-art { background: var(--surface2); border-top: 1px solid rgba(0,0,0,0.15); border-bottom: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; padding: 1rem 0; }
-.card-modal-art-icon { font-size: 2.8rem; line-height: 1; }
+.card-modal-art { background: transparent; display: flex; align-items: center; justify-content: center; padding: 0.6rem 0; }
+.card-modal-art-icon { font-size: 3.5rem; line-height: 1; }
 /* Body */
-.card-modal-body { padding: 0.75rem 0.9rem 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
-.card-modal-name { font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: var(--px-dark); line-height: 1.6; }
-.card-modal-edu { font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); font-style: italic; }
-.card-modal-effect { font-size: 0.9rem; font-weight: 600; color: var(--text); line-height: 1.5; border-top: 1px solid var(--border); padding-top: 0.4rem; }
+.card-modal-body { padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; text-align: center; }
+.card-modal-name { font-family: 'Press Start 2P', monospace; font-size: 0.75rem; color: var(--px-dark); line-height: 1.6; text-align: center; }
+.card-modal-edu { font-size: 0.75rem; line-height: 1.5; color: var(--text-muted); font-style: italic; text-align: center; }
+.card-modal-effect { font-size: 0.8rem; font-weight: 600; color: var(--text); line-height: 1.5; border-top: 1px solid var(--border); padding-top: 0.35rem; }
+.card-modal-ok {
+  margin: auto 0.9rem 0.9rem;
+  background: #5a7a3a; color: #fff;
+  border: 2px solid var(--px-dark);
+  box-shadow: 2px 2px 0 var(--px-dark);
+  font-size: 0.7rem; font-weight: 700; font-family: inherit;
+  padding: 0.3rem; cursor: pointer; width: calc(100% - 1.8rem);
+  transition: background 0.1s, transform 0.1s;
+}
+.card-modal-ok:hover { background: #6a8f48; transform: translate(-1px,-1px); }
 
 /* ── Game Over ────────────────────────────────────────────── */
 .gameover-screen {
@@ -1497,6 +1528,52 @@ input, select { font-family: inherit; }
   60%  { transform: scale(1.04) translateY(-4px); opacity: 1; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
+.board-phase-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6);
+}
+@keyframes board-phase-overlay-pulse {
+  0%, 100% { background: rgba(0,0,0,0.6); }
+  50%       { background: rgba(217,119,6,0.25); }
+}
+.board-phase-overlay { animation: board-phase-overlay-pulse 1.6s ease-in-out infinite; }
+.board-phase-border {
+  width: min(300px, 88vw);
+  background: #d97706;
+  padding: 3px;
+  clip-path: polygon(
+    0 10px, 4px 6px, 6px 4px, 10px 0,
+    calc(100% - 10px) 0, calc(100% - 6px) 4px, calc(100% - 4px) 6px, 100% 10px,
+    100% calc(100% - 10px), calc(100% - 4px) calc(100% - 6px), calc(100% - 6px) calc(100% - 4px), calc(100% - 10px) 100%,
+    10px 100%, 6px calc(100% - 4px), 4px calc(100% - 6px), 0 calc(100% - 10px)
+  );
+  filter: drop-shadow(0 0 12px rgba(217,119,6,0.45)) drop-shadow(6px 6px 0 var(--px-dark));
+}
+.board-phase-card {
+  background: #f5f0e8;
+  display: flex; flex-direction: column;
+  clip-path: polygon(
+    0 8px, 3px 4px, 4px 3px, 8px 0,
+    calc(100% - 8px) 0, calc(100% - 4px) 3px, calc(100% - 3px) 4px, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 3px) calc(100% - 4px), calc(100% - 4px) calc(100% - 3px), calc(100% - 8px) 100%,
+    8px 100%, 4px calc(100% - 3px), 3px calc(100% - 4px), 0 calc(100% - 8px)
+  );
+}
+.board-phase-body {
+  padding: 1.25rem 0.75rem 0.75rem; display: flex; flex-direction: column;
+  align-items: center; gap: 0.55rem; text-align: center;
+}
+.board-phase-icon { font-size: 2.8rem; line-height: 1; }
+.board-phase-title {
+  font-family: 'Press Start 2P', monospace; font-size: 0.85rem;
+  color: #d97706; line-height: 1.5;
+}
+.board-phase-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.55; }
+.board-phase-footer { padding: 0 0.75rem 0.75rem; }
+.board-phase-btn { width: 100%; background: #2d2d2d; color: #fff; border-color: #1a1a1a; }
+.board-phase-btn:hover { background: #3d3d3d; }
+
 .incident-overlay {
   position: fixed; inset: 0; z-index: 300;
   display: flex; align-items: center; justify-content: center;
@@ -2139,6 +2216,15 @@ input, select { font-family: inherit; }
 .tutorial-overlay-title {
   font-size: 0.75rem; font-weight: 700; letter-spacing: 1px;
   text-transform: uppercase; color: var(--px-gold);
+}
+.log-round-badge {
+  font-size: 0.78rem; font-weight: 700; color: var(--px-gold);
+  background: var(--surface2);
+  border: 2px solid var(--px-gold);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.08);
+  padding: 0.4rem 0.75rem;
+  text-transform: uppercase; letter-spacing: 1px;
+  text-align: center;
 }
 .tutorial-overlay-close {
   background: #5a7a3a; color: #fff; border: 2px solid var(--px-dark);

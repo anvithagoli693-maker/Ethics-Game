@@ -401,6 +401,7 @@ function GameScreen({ playerCount, onRestart, onNewGame }: GameScreenProps) {
               <span className="tutorial-overlay-title">Game Log</span>
               <button className="tutorial-overlay-close" onClick={() => setShowLog(false)}>✕</button>
             </div>
+            <div className="log-round-badge">Round {state.round}</div>
             <GameLog log={state.gameLog} />
           </div>
         </div>
@@ -645,6 +646,26 @@ function GameScreen({ playerCount, onRestart, onNewGame }: GameScreenProps) {
 
       {/* ── Role overview overlay ────────────────────────────────── */}
       {showRoles && <RoleOverlay state={state} onClose={() => setShowRoles(false)} />}
+
+      {/* ── Board phase overlay ──────────────────────────────── */}
+      {state.phase === 'board-phase' && !state.pendingIncident && (
+        <div className="board-phase-overlay">
+          <div className="board-phase-border">
+          <div className="board-phase-card">
+            <div className="board-phase-body">
+              <div className="board-phase-icon">⚠️</div>
+              <div className="board-phase-title">Board Phase</div>
+              <p className="board-phase-text">All players have taken their turns. The city is placing the next surveillance device.</p>
+            </div>
+            <div className="board-phase-footer">
+              <button className="btn board-phase-btn" onClick={() => dispatch({ type: 'BOARD_PHASE' })}>
+                Place Device
+              </button>
+            </div>
+          </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Surveillance incident overlay — shown after drawn cards are confirmed ── */}
       {state.pendingIncident && !state.pendingDrawnCards && (
